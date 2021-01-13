@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LookaukwatMobile.Views.UploadImagePage"
+             BackgroundColor="White">
+    <StackLayout Orientation="Vertical">
+        <Label Text="Vous pouvez ajouter jusqu'a trois(3) images"
+               HorizontalOptions="Center"
+               TextColor="Black"
+               FontSize="12"></Label>
+
+        <Button Text="prendre une photo"
+                BackgroundColor="Teal"
+                TextColor="Wheat"
+                FontSize="12"
+                Clicked="PickPhoto_Click"></Button>
+
+        <Button Text="choisir une photo"
+                BackgroundColor="Navy"
+                TextColor="White"
+                FontSize="9"
+                Clicked="TakePhoto_Click"></Button>
+
+        <Image x:Name="FileImage"
+               WidthRequest="300"
+               HeightRequest="220"></Image>
+
+        <Label x:Name="LocalPathLabel"
+               FontSize="18"
+               TextColor="Black"></Label>
+
+        <Button Text="Télécharger une photo"
+                BackgroundColor="Purple"
+                TextColor="White"
+                FontSize="8"
+                Clicked="UploadPhoto_Click"></Button>
+
+        <Label x:Name="RemotePathLabel"
+               FontSize="8"
+               TextColor="Black"></Label>
+    </StackLayout>
+</ContentPage>

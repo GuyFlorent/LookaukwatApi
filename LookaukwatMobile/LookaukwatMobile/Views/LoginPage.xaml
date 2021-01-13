@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LookaukwatMobile.Views.LoginPage"
+             Title="{Binding Title}"
+             xmlns:viewModels="clr-namespace:LookaukwatMobile.ViewModels"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.NavBarIsVisible="False">
+
+    
+    <ContentPage.BindingContext>
+        <viewModels:LoginViewModel></viewModels:LoginViewModel>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <StackLayout Margin="20,35,20,25">
+            <Entry Placeholder="Adresse Email"
+                   Text="{Binding Username}"></Entry>
+            
+            <Entry Placeholder="Mot de passe" 
+                   IsPassword="True"
+                   Text="{Binding Password}"></Entry>
+            
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Mémoriser le mot de passe ?"></Label>
+                <Switch IsToggled="False"></Switch>
+            </StackLayout>
+            <Button Text="Créer"
+                    TextColor="Blue"
+                    Command="{Binding LoginCommand }"></Button>
+            <StackLayout>
+                <Label Text="Vous n'avez pas de compte? " TextColor="Blue"></Label>
+                <Button
+                             Command="{Binding RegisterViewCommand }"
+                            CornerRadius="4"
+                            TextColor="Blue"
+                            BackgroundColor="Transparent"
+                            Text="Créer en 2 minutes ici" />
+            </StackLayout>
+
+        </StackLayout>
+       
+    </ContentPage.Content>
+</ContentPage>

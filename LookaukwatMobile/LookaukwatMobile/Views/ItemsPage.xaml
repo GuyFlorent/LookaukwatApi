@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LookaukwatMobile.Views.ItemsPage"
+             Title="{Binding Title}"
+             xmlns:local="clr-namespace:LookaukwatMobile.ViewModels"  
+             xmlns:model="clr-namespace:LookaukwatMobile.Models" 
+             xmlns:extended="clr-namespace:Xamarin.Forms.Extended;assembly=Xamarin.Forms.Extended.InfiniteScrolling"
+             x:Name="BrowseItemsPage">
+
+    <!--<ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding AddItemCommand}" />
+    </ContentPage.ToolbarItems>-->
+    <!--
+      x:DataType enables compiled bindings for better performance and compile time validation of binding expressions.
+      https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/data-binding/compiled-bindings
+    -->
+    <!--<RefreshView x:DataType="local:ItemsViewModel" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">-->
+       
+        <!--<StackLayout Padding="10" >
+        <ListView x:Name="ItemsListView"
+                ItemsSource="{Binding Items}"
+                SelectionMode="None"
+                  CachingStrategy="RecycleElement" 
+                  HasUnevenRows="True">
+            <ListView.Behaviors>
+                <extended:InfiniteScrollBehavior   IsLoadingMore="{Binding IsRefressing}"></extended:InfiniteScrollBehavior>
+            </ListView.Behaviors>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell x:DataType="model:ProductModel">
+                        
+                            <Grid Padding="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.RowSpan="3" 
+                       Source="{Binding Images[0].Image }"
+                       Aspect="AspectFill"
+                       HeightRequest="60"
+                       WidthRequest="60"></Image>
+
+                                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       FontAttributes="Bold"></Label>
+
+                                <Label Grid.Column="1"
+                           Grid.Row="1"
+                           TextColor="Red"
+                           Text="{Binding Price}"
+                           VerticalOptions="Center"></Label>
+
+                                <Label Grid.Column="1"
+                           Grid.Row="2"
+                       Text="{Binding Town}"
+                       VerticalOptions="End"></Label>
+                            </Grid>
+                            --><!--<StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                NumberOfTapsRequired="1"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:ItemsViewModel}}, Path=ItemTapped}"		
+                                CommandParameter="{Binding .}">
+                                </TapGestureRecognizer>
+                            </StackLayout.GestureRecognizers>--><!--
+                       
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+            <ListView.Footer>
+                <Grid Padding="6" IsVisible="{Binding IsRefressing}">
+                    --><!--set the footer to have a zero height wheb visible--><!--
+                    <Grid.Triggers>
+                        --><!--the loading content--><!--
+                        <Trigger TargetType="Grid" Property="IsVisible" Value="False">
+                            <Setter Property="HeightRequest" Value="0"></Setter>
+                        </Trigger>
+                    </Grid.Triggers>
+                    <Label Text="Téléchargement..." 
+                               TextColor="DeepPink" 
+                               FontSize="20"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"></Label>
+                </Grid>
+            </ListView.Footer>
+        </ListView>
+        </StackLayout>-->
+    <!--</RefreshView>-->
+
+
+    <ContentPage.BindingContext>
+        <local:ItemsViewModel />
+    </ContentPage.BindingContext>
+
+
+
+    <StackLayout>
+
+        <Label Text="Infinite Scroll" FontSize="52" TextColor="DeepPink" Margin="20,0" />
+        <Label Text="Xamarin.Forms" FontSize="46" TextColor="DodgerBlue" Margin="20,0" />
+        <RefreshView  Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsRefressing, Mode=TwoWay}">
+            <ListView ItemsSource="{Binding Items}" 
+                      CachingStrategy="RecycleElement" 
+                      HasUnevenRows="True"
+                      SelectionMode="None">
+                    <ListView.Behaviors>
+                <extended:InfiniteScrollBehavior IsLoadingMore="{Binding IsBusy}" />
+            </ListView.Behaviors>
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                            <StackLayout>
+
+                                <Grid Padding="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.RowSpan="3" 
+                       Source="{Binding Image }"
+                       Aspect="AspectFill"
+                       HeightRequest="60"
+                       WidthRequest="60"></Image>
+
+                            <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       FontAttributes="Bold"></Label>
+
+                            <Label Grid.Column="1"
+                           Grid.Row="1"
+                           TextColor="Red"
+                           Text="{Binding Price}"
+                           VerticalOptions="Center"></Label>
+
+                            <Label Grid.Column="1"
+                           Grid.Row="2"
+                       Text="{Binding Town}"
+                       VerticalOptions="End"></Label>
+                        </Grid>
+
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                NumberOfTapsRequired="1"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:ItemsViewModel}}, Path=ItemTapped}"		
+                                CommandParameter="{Binding .}">
+                                </TapGestureRecognizer>
+                            </StackLayout.GestureRecognizers>
+                            </StackLayout>
+                        </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+            <ListView.Footer>
+                <Grid Padding="6" IsVisible="{Binding IsBusy}">
+                    <!-- set the footer to have a zero height when invisible -->
+                    <Grid.Triggers>
+                        <Trigger TargetType="Grid" Property="IsVisible" Value="False">
+                            <Setter Property="HeightRequest" Value="0" />
+                        </Trigger>
+                    </Grid.Triggers>
+                    <!-- the loading content -->
+                    <Label Text="Loading..." TextColor="DeepPink" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center" />
+                </Grid>
+            </ListView.Footer>
+    
+    </ListView>
+        </RefreshView>
+    </StackLayout>
+</ContentPage>

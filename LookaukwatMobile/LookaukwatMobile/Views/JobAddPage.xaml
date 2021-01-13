@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LookaukwatMobile.Views.JobAddPage"
+              xmlns:local="clr-namespace:LookaukwatMobile.ViewModels"
+             Title="{Binding Title}">
+
+    <ContentPage.BindingContext>
+        <local:JobViewModel></local:JobViewModel>
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <ScrollView>
+        <StackLayout Orientation="Vertical"
+                     Margin="15,35,20,25">
+            
+            <Label Text="Déposer une annonce catégorie emploi"
+                VerticalOptions="StartAndExpand" 
+                HorizontalOptions="Center" />
+            <Picker 
+                    x:Name="pickerSearcheOrAsk" 
+                    Title="Choisir entre J'offre ou je recherche"
+                    ItemsSource="{Binding SearchOrSaskList}"
+                    SelectedItem="{Binding SearchOrAskJob, Mode=TwoWay}">
+            </Picker>
+            <Picker 
+                    x:Name="pickerActivitySectork" 
+                    Title="Choisir le secteur d'activité"
+                    ItemsSource="{Binding ActivitysectorList}"
+                    SelectedItem="{Binding ActivitySector, Mode=TwoWay}">
+            </Picker>
+            <Picker 
+                    x:Name="pickerTypeContract" 
+                    Title="Choisir le type de contrat"
+                    ItemsSource="{Binding ContractList}"
+                    SelectedItem="{Binding TypeContract, Mode=TwoWay}">
+            </Picker>
+            <Entry Placeholder="Saisir le titre de l'annonce"
+                   Text="{Binding TitleJob}"></Entry>
+            <Editor Placeholder="Donnez une description assez clair sur l'emploi et le lieu excacte"
+                    Text="{Binding Description}"
+                    HeightRequest="60"
+                    WidthRequest="60"></Editor>
+            <Entry Placeholder="Saisir le salaire en entier ou juste zéro (0)"
+                   Text="{Binding Price}"></Entry>
+            <Picker 
+                    x:Name="pickerTown" 
+                    Title="Choisir la ville"
+                    ItemsSource="{Binding TownList}"
+                    SelectedItem="{Binding Town, Mode=TwoWay}">
+            </Picker>
+            <Entry Placeholder="Saisir le nom du quartier"
+                   Text="{Binding Street}"></Entry>
+
+            <Button Text="Suivant"
+                    Command="{Binding PostJobCommad}"
+                    VerticalOptions="EndAndExpand"></Button>
+        </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

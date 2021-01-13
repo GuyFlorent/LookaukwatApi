@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LookaukwatMobile.Views.ItemDetailPage"
+             Title="{Binding Title}">
+    <ScrollView>
+        <StackLayout >
+            <CarouselView ItemsSource="{Binding Images}"
+                          >
+                
+                <CarouselView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout>
+                            <Frame HasShadow="True"
+                       BorderColor="DarkGray"
+                       CornerRadius="5"
+                       Margin="20"
+                       HeightRequest="300"
+                       HorizontalOptions="Center"
+                       VerticalOptions="StartAndExpand">
+                                <StackLayout>
+                                    
+                                    <Image Source="{Binding .}"
+                               Aspect="AspectFill"
+                               HeightRequest="300"
+                               WidthRequest="300"
+                               HorizontalOptions="Center" />
+                                    
+                                </StackLayout>
+                            </Frame>
+                        </StackLayout>
+                    </DataTemplate>
+                </CarouselView.ItemTemplate>
+            </CarouselView>
+        
+        <Label Text="{Binding Title}"></Label>
+            <Label Text="{Binding Price}"
+                   VerticalOptions="Start"
+                   TextColor="Red"></Label>
+            
+            <Label Text="{Binding Description}"
+                   MaxLines="50"
+                   LineBreakMode="WordWrap"
+                   ></Label>
+          
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>
