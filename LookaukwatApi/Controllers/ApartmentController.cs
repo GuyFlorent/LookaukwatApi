@@ -35,6 +35,8 @@ namespace LookaukwatApi.Controllers
             {
                 return NotFound();
             }
+            apartmentRentalModel.ViewNumber++;
+            await db.SaveChangesAsync();
 
             var ListeSimilar = db.ApartmentRentals.Where(m => m.Category.CategoryName == apartmentRentalModel.Category.CategoryName &&
             m.Town == apartmentRentalModel.Town && m.SearchOrAskJob == apartmentRentalModel.SearchOrAskJob &&
@@ -97,17 +99,17 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (!string.IsNullOrWhiteSpace(typeAppart))
+            if (!string.IsNullOrWhiteSpace(typeAppart) && typeAppart != "Tout")
             {
                 results = results.Where(m => m.TypeAppart == typeAppart).ToList();
             }
 
-            if (price >= 0)
+            if (price >= 0 && price < 1000000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(furnitureOrNotAppart) && typeAppart !="Terrain à vendre")
+            if (!string.IsNullOrWhiteSpace(furnitureOrNotAppart) && typeAppart !="Terrain à vendre" && furnitureOrNotAppart != "Tout")
             {
                 results = results.Where(m => m.FurnitureOrNotAppart == furnitureOrNotAppart).ToList();
 
@@ -118,12 +120,12 @@ namespace LookaukwatApi.Controllers
             }
 
            
-            if (apartSurfaceAppart >= 0)
+            if (apartSurfaceAppart >= 0 && apartSurfaceAppart < 2000)
             {
                 results = results.Where(m => m.ApartSurfaceAppart <= apartSurfaceAppart).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
@@ -159,7 +161,7 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (!string.IsNullOrWhiteSpace(typeAppart))
+            if (!string.IsNullOrWhiteSpace(typeAppart) && typeAppart != "Tout")
             {
                 results = results.Where(m => m.TypeAppart == typeAppart).ToList();
             }
@@ -169,7 +171,7 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(furnitureOrNotAppart) && typeAppart != "Terrain à vendre")
+            if (!string.IsNullOrWhiteSpace(furnitureOrNotAppart) && typeAppart != "Terrain à vendre" && furnitureOrNotAppart != "Tout")
             {
                 results = results.Where(m => m.FurnitureOrNotAppart == furnitureOrNotAppart).ToList();
 
@@ -185,7 +187,7 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => m.ApartSurfaceAppart <= apartSurfaceAppart).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }

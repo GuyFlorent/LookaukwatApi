@@ -35,6 +35,8 @@ namespace LookaukwatApi.Controllers
             {
                 return NotFound();
             }
+            multimediaModel.ViewNumber++;
+            await db.SaveChangesAsync();
 
             var ListeSimilar = db.Multimedia.Where(m => m.Category.CategoryName == multimediaModel.Category.CategoryName &&
            m.Town == multimediaModel.Town && m.SearchOrAskJob == multimediaModel.SearchOrAskJob &&
@@ -96,32 +98,32 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 100000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaBrand))
+            if (!string.IsNullOrWhiteSpace(multimediaBrand) && multimediaBrand != "Toutes")
             {
                 results = results.Where(m => m.MultimediaBrand == multimediaBrand).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaModel))
+            if (!string.IsNullOrWhiteSpace(multimediaModel) && multimediaModel != "Tout")
             {
                 results = results.Where(m => m.MultimediaModel == multimediaModel).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaRubrique))
+            if (!string.IsNullOrWhiteSpace(multimediaRubrique) && multimediaRubrique != "Toutes")
             {
                 results = results.Where(m => m.MultimediaRubrique == multimediaRubrique).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaCapacity))
+            if (!string.IsNullOrWhiteSpace(multimediaCapacity) && multimediaCapacity != "Toutes")
             {
                 results = results.Where(m => m.MultimediaCapacity == multimediaCapacity).ToList();
             }
@@ -130,8 +132,8 @@ namespace LookaukwatApi.Controllers
         }
 
         // Result of Offer search Multimedia
-        [Route("api/Multimedia/GetOfferMultiSearchNumber")]
-        public async Task<List<ProductForMobile>> GetOfferMultiSearchNumber(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity, int pageIndex, int pageSize)
+        [Route("api/Multimedia/GetOfferMultiSearch")]
+        public async Task<List<ProductForMobile>> GetOfferMultiSearch(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity, int pageIndex, int pageSize)
         {
 
             var results = await db.Multimedia.
@@ -153,32 +155,32 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 100000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaBrand))
+            if (!string.IsNullOrWhiteSpace(multimediaBrand) && multimediaBrand != "Toutes")
             {
                 results = results.Where(m => m.MultimediaBrand == multimediaBrand).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaModel))
+            if (!string.IsNullOrWhiteSpace(multimediaModel) && multimediaModel != "Tout")
             {
                 results = results.Where(m => m.MultimediaModel == multimediaModel).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaRubrique))
+            if (!string.IsNullOrWhiteSpace(multimediaRubrique) && multimediaRubrique != "Toutes")
             {
                 results = results.Where(m => m.MultimediaRubrique == multimediaRubrique).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(multimediaCapacity))
+            if (!string.IsNullOrWhiteSpace(multimediaCapacity) && multimediaCapacity != "Toutes")
             {
                 results = results.Where(m => m.MultimediaCapacity == multimediaCapacity).ToList();
             }

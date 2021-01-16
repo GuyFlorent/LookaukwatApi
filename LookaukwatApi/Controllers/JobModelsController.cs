@@ -36,6 +36,9 @@ namespace LookaukwatApi.Controllers
                 return NotFound();
             }
 
+            jobModel.ViewNumber++;
+            await db.SaveChangesAsync();
+
             var ListeSimilar = db.Jobs.Where(m => m.Category.CategoryName == jobModel.Category.CategoryName &&
             m.Town == jobModel.Town && m.SearchOrAskJob == jobModel.SearchOrAskJob && m.id != jobModel.id).OrderBy(o => Guid.NewGuid()).
             Take(6).Select(s => new SimilarProductViewModel
@@ -125,22 +128,22 @@ namespace LookaukwatApi.Controllers
                   
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob ).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 300000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(typeContract))
+            if (!string.IsNullOrWhiteSpace(typeContract) && typeContract != "Tout")
             {
                 results = results.Where(m => m.TypeContract == typeContract).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(activitySector))
+            if (!string.IsNullOrWhiteSpace(activitySector) && activitySector != "Tout")
             {
                 results = results.Where(m => m.ActivitySector == activitySector).ToList();
             }
@@ -176,17 +179,17 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(typeContract))
+            if (!string.IsNullOrWhiteSpace(typeContract) && typeContract != "Tout")
             {
                 results = results.Where(m => m.TypeContract == typeContract).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(activitySector))
+            if (!string.IsNullOrWhiteSpace(activitySector) && activitySector != "Tout")
             {
                 results = results.Where(m => m.ActivitySector == activitySector).ToList();
             }

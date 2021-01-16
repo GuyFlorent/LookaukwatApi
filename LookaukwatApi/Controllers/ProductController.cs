@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using LookaukwatApi.Models;
+using LookaukwatApi.Services;
 using LookaukwatApi.ViewModel;
 using Microsoft.AspNet.Identity;
 
@@ -138,7 +139,7 @@ namespace LookaukwatApi.Controllers
                             ImageProcductModel picture = new ImageProcductModel
                             {
                             Image = Image,
-                            ImageMobile = "https://lookaukwat.azurewebsites.net/" + Image,
+                            ImageMobile = "https://lookaukwatapi.azurewebsites.net/" + Image,
                             id = Guid.NewGuid(),
                             ProductId = id
                         };
@@ -181,7 +182,14 @@ namespace LookaukwatApi.Controllers
             return "Ok";
         }
 
-        
+
+        // Result of Ask and offer search
+        [Route("api/Product/PostMessage")]
+        public async Task<bool> PostMessage(contactUserViewModel contact)
+        {
+          var response =  await SendGridService.configSendGridasync(contact);
+            return response;
+        }
 
 
         // Result of Ask and offer search
@@ -198,12 +206,12 @@ namespace LookaukwatApi.Controllers
                 }).Where(m =>  m.SearchOrAsk == searchOrAsk)
                 .ToListAsync();
           
-            if(!string.IsNullOrWhiteSpace(categori) && categori != "Toutes les Catégories")
+            if(!string.IsNullOrWhiteSpace(categori) && categori != "Toutes")
             {
                 results = results.Where(m => m.Category == categori).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
@@ -232,12 +240,12 @@ namespace LookaukwatApi.Controllers
               }).Where(m => m.SearchOrAsk == searchOrAsk)
               .ToListAsync();
 
-            if (!string.IsNullOrWhiteSpace(categori) && categori != "Toutes les Catégories")
+            if (!string.IsNullOrWhiteSpace(categori) && categori != "Toutes")
             {
                 results = results.Where(m => m.Category == categori).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
@@ -362,7 +370,7 @@ namespace LookaukwatApi.Controllers
 
         // DELETE: api/Product/5
         [ResponseType(typeof(ProductModel))]
-        [Authorize]
+        //[Authorize]
         public async Task<IHttpActionResult> DeleteProductModel(int id)
         {
             ProductModel productModel = await db.Products.FindAsync(id);
@@ -381,7 +389,7 @@ namespace LookaukwatApi.Controllers
                 }
                 else
                 {
-                    path = item.Image;
+                    path = System.Web.Hosting.HostingEnvironment.MapPath(item.Image);
                 }
 
                 if (System.IO.File.Exists(path))

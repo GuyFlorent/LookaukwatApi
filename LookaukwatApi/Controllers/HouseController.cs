@@ -35,6 +35,8 @@ namespace LookaukwatApi.Controllers
             {
                 return NotFound();
             }
+            houseModel.ViewNumber++;
+            await db.SaveChangesAsync();
 
             var ListeSimilar = db.Houses.Where(m => m.Category.CategoryName == houseModel.Category.CategoryName &&
            m.Town == houseModel.Town && m.SearchOrAskJob == houseModel.SearchOrAskJob &&
@@ -99,37 +101,37 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 100000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(typeHouse))
+            if (!string.IsNullOrWhiteSpace(typeHouse) && typeHouse != "Tout")
             {
                 results = results.Where(m => m.TypeHouse == typeHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(rubriqueHouse))
+            if (!string.IsNullOrWhiteSpace(rubriqueHouse) && rubriqueHouse != "Toutes")
             {
                 results = results.Where(m => m.RubriqueHouse == rubriqueHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(colorHouse))
+            if (!string.IsNullOrWhiteSpace(colorHouse) && colorHouse != "Toutes")
             {
                 results = results.Where(m => m.ColorHouse == colorHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(fabricMaterialHouse))
+            if (!string.IsNullOrWhiteSpace(fabricMaterialHouse) && fabricMaterialHouse != "Tout")
             {
                 results = results.Where(m => m.FabricMaterialHouse == fabricMaterialHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(stateHouse))
+            if (!string.IsNullOrWhiteSpace(stateHouse) && stateHouse != "Tout")
             {
                 results = results.Where(m => m.StateHouse == stateHouse).ToList();
             }
@@ -164,37 +166,37 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 100000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(typeHouse))
+            if (!string.IsNullOrWhiteSpace(typeHouse) && typeHouse != "Tout")
             {
                 results = results.Where(m => m.TypeHouse == typeHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(rubriqueHouse))
+            if (!string.IsNullOrWhiteSpace(rubriqueHouse) && rubriqueHouse != "Toutes")
             {
                 results = results.Where(m => m.RubriqueHouse == rubriqueHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(colorHouse))
+            if (!string.IsNullOrWhiteSpace(colorHouse) && colorHouse != "Toutes")
             {
                 results = results.Where(m => m.ColorHouse == colorHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(fabricMaterialHouse))
+            if (!string.IsNullOrWhiteSpace(fabricMaterialHouse) && fabricMaterialHouse != "Tout")
             {
                 results = results.Where(m => m.FabricMaterialHouse == fabricMaterialHouse).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(stateHouse))
+            if (!string.IsNullOrWhiteSpace(stateHouse) && stateHouse != "Tout")
             {
                 results = results.Where(m => m.StateHouse == stateHouse).ToList();
             }

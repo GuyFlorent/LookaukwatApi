@@ -19,7 +19,7 @@ namespace LookaukwatApi.Controllers
     public class VehiculeController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-
+        
         // GET: api/Vehicule
         public IQueryable<VehiculeModel> GetProducts()
         {
@@ -35,6 +35,8 @@ namespace LookaukwatApi.Controllers
             {
                 return NotFound();
             }
+            vehiculeModel.ViewNumber++;
+            await db.SaveChangesAsync();
 
             var ListeSimilar = db.Vehicules.Where(m => m.Category.CategoryName == vehiculeModel.Category.CategoryName &&
           m.Town == vehiculeModel.Town && m.SearchOrAskJob == vehiculeModel.SearchOrAskJob &&
@@ -104,24 +106,25 @@ namespace LookaukwatApi.Controllers
                   Year = s.YearVehicule,
                   Mileage = s.MileageVehicule,
                   NumberOfDoor = s.NumberOfDoorVehicule,
-                  GearBox = gearBox,
-                  Color = color,
+                  GearBox = s.GearBoxVehicule,
+                  Color = s.ColorVehicule,
+                  Vehiculestate = s.StateVehicule,
                   VehiculeRubrique = s.RubriqueVehicule
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 2000000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
 
-            if (!string.IsNullOrWhiteSpace(vehiculeRubrique))
+            if (!string.IsNullOrWhiteSpace(vehiculeRubrique) && vehiculeRubrique != "Toutes")
             {
                 results = results.Where(m => m.VehiculeRubrique == vehiculeRubrique).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
@@ -131,43 +134,48 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => Convert.ToInt32( m.Year) <= Convert.ToInt32(year)).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(mileage))
+            if (!string.IsNullOrWhiteSpace(mileage) && Convert.ToInt32(mileage) <300000)
             {
                 results = results.Where(m => Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(vehiculeBrand))
+            if (!string.IsNullOrWhiteSpace(vehiculeBrand) && vehiculeBrand != "Toutes")
             {
                 results = results.Where(m => m.VehiculeBrand == vehiculeBrand).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(vehiculeModel))
+            if (!string.IsNullOrWhiteSpace(vehiculeModel) && vehiculeModel != "Tout")
             {
                 results = results.Where(m => m.VehiculeModel == vehiculeModel).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(vehiculeType))
+            if (!string.IsNullOrWhiteSpace(vehiculeType) && vehiculeType != "Tout")
             {
                 results = results.Where(m => m.VehiculeType == vehiculeType).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(petrol))
+            if (!string.IsNullOrWhiteSpace(petrol) && petrol != "Tout")
             {
                 results = results.Where(m => m.Petrol == petrol).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(numberOfDoor))
+            if (!string.IsNullOrWhiteSpace(numberOfDoor) && numberOfDoor != "Toutes")
             {
                 results = results.Where(m => m.NumberOfDoor == numberOfDoor).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(gearBox))
+            if (!string.IsNullOrWhiteSpace(gearBox) && gearBox != "Toutes")
             {
                 results = results.Where(m => m.GearBox == gearBox).ToList();
             }
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!string.IsNullOrWhiteSpace(color) && color != "Toutes")
             {
                 results = results.Where(m => m.Color == color).ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(vehiculestate) && vehiculestate != "Tout")
+            {
+                results = results.Where(m => m.Vehiculestate == vehiculestate).ToList();
             }
 
 
@@ -177,7 +185,7 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Vehicule
         [Route("api/Vehicule/GetOfferVehiculeSearch")]
-        public async Task<List<ProductForMobile>> GetOfferVehiculeSearch(string categori, string town, string searchOrAskJob, int price, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color, int pageIndex, int pageSize)
+        public async Task<List<ProductForMobile>> GetOfferVehiculeSearch(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color, int pageIndex, int pageSize)
         {
 
             var results = await db.Vehicules.
@@ -199,12 +207,22 @@ namespace LookaukwatApi.Controllers
                   Year = s.YearVehicule,
                   Mileage = s.MileageVehicule,
                   NumberOfDoor = s.NumberOfDoorVehicule,
-                  GearBox = gearBox,
-                  Color = color
+                  GearBox = s.GearBoxVehicule,
+                  Color = s.ColorVehicule,
+                  Vehiculestate = s.StateVehicule,
+                  VehiculeRubrique = s.RubriqueVehicule
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (!string.IsNullOrWhiteSpace(vehiculeRubrique) && vehiculeRubrique != "Toutes")
+            {
+                results = results.Where(m => m.VehiculeRubrique == vehiculeRubrique).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
+            {
+                results = results.Where(m => m.Town == town).ToList();
+            }
+            if (price >= 0 && price < 2000000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
@@ -219,38 +237,42 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(vehiculeBrand))
+            if (!string.IsNullOrWhiteSpace(vehiculeBrand) && vehiculeBrand != "Toutes")
             {
                 results = results.Where(m => m.VehiculeBrand == vehiculeBrand).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(vehiculeModel))
+            if (!string.IsNullOrWhiteSpace(vehiculeModel) && vehiculeModel != "Tout")
             {
                 results = results.Where(m => m.VehiculeModel == vehiculeModel).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(vehiculeType))
+            if (!string.IsNullOrWhiteSpace(vehiculeType) && vehiculeType != "Tout")
             {
                 results = results.Where(m => m.VehiculeType == vehiculeType).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(petrol))
+            if (!string.IsNullOrWhiteSpace(petrol) && petrol != "Tout")
             {
                 results = results.Where(m => m.Petrol == petrol).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(numberOfDoor))
+            if (!string.IsNullOrWhiteSpace(numberOfDoor) && numberOfDoor != "Toutes")
             {
                 results = results.Where(m => m.NumberOfDoor == numberOfDoor).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(gearBox))
+            if (!string.IsNullOrWhiteSpace(gearBox) && gearBox != "Toutes")
             {
                 results = results.Where(m => m.GearBox == gearBox).ToList();
             }
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!string.IsNullOrWhiteSpace(color) && color != "Toutes")
             {
                 results = results.Where(m => m.Color == color).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(vehiculestate) && vehiculestate != "Tout")
+            {
+                results = results.Where(m => m.Vehiculestate == vehiculestate).ToList();
             }
 
 

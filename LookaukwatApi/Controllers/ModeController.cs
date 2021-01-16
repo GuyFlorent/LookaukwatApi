@@ -36,6 +36,9 @@ namespace LookaukwatApi.Controllers
                 return NotFound();
             }
 
+            modeModel.ViewNumber++;
+            await db.SaveChangesAsync();
+
             var ListeSimilar = db.Modes.Where(m => m.Category.CategoryName == modeModel.Category.CategoryName &&
             m.Town == modeModel.Town && m.SearchOrAskJob == modeModel.SearchOrAskJob &&
             m.RubriqueMode == modeModel.RubriqueMode && m.id != modeModel.id && m.RubriqueMode == modeModel.RubriqueMode).OrderBy(o => Guid.NewGuid()).
@@ -101,46 +104,46 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 100000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(rubriqueMode))
+            if (!string.IsNullOrWhiteSpace(rubriqueMode) && rubriqueMode != "Toutes")
             {
                 results = results.Where(m => m.RubriqueMode == rubriqueMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(typeMode))
+            if (!string.IsNullOrWhiteSpace(typeMode) && typeMode != "Tout")
             {
                 results = results.Where(m => m.TypeMode == typeMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(brandMode))
+            if (!string.IsNullOrWhiteSpace(brandMode) && brandMode != "Toutes")
             {
                 results = results.Where(m => m.BrandMode == brandMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(universMode))
+            if (!string.IsNullOrWhiteSpace(universMode) && universMode != "Tout")
             {
                 results = results.Where(m => m.UniversMode == universMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(sizeMode))
+            if (!string.IsNullOrWhiteSpace(sizeMode) && sizeMode != "Toutes")
             {
                 results = results.Where(m => m.SizeMode == sizeMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(state))
+            if (!string.IsNullOrWhiteSpace(state) && state != "Tout")
             {
                 results = results.Where(m => m.State == state).ToList();
             }
-            if (!string.IsNullOrWhiteSpace(colorMode))
+            if (!string.IsNullOrWhiteSpace(colorMode) && colorMode != "Toutes")
             {
                 results = results.Where(m => m.ColorMode == colorMode).ToList();
             }
@@ -176,46 +179,46 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
-            if (price >= 0)
+            if (price >= 0 && price < 100000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(town))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
                 results = results.Where(m => m.Town == town).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(rubriqueMode))
+            if (!string.IsNullOrWhiteSpace(rubriqueMode) && rubriqueMode != "Toutes")
             {
                 results = results.Where(m => m.RubriqueMode == rubriqueMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(typeMode))
+            if (!string.IsNullOrWhiteSpace(typeMode) && typeMode != "Tout")
             {
                 results = results.Where(m => m.TypeMode == typeMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(brandMode))
+            if (!string.IsNullOrWhiteSpace(brandMode) && brandMode != "Toutes")
             {
                 results = results.Where(m => m.BrandMode == brandMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(universMode))
+            if (!string.IsNullOrWhiteSpace(universMode) && universMode != "Tout")
             {
                 results = results.Where(m => m.UniversMode == universMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(sizeMode))
+            if (!string.IsNullOrWhiteSpace(sizeMode) && sizeMode != "Toutes")
             {
                 results = results.Where(m => m.SizeMode == sizeMode).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(state))
+            if (!string.IsNullOrWhiteSpace(state) && state != "Tout")
             {
                 results = results.Where(m => m.State == state).ToList();
             }
-            if (!string.IsNullOrWhiteSpace(colorMode))
+            if (!string.IsNullOrWhiteSpace(colorMode) && colorMode != "Toutes")
             {
                 results = results.Where(m => m.ColorMode == colorMode).ToList();
             }
