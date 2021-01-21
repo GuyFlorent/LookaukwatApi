@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.ModelBinding;
 using LookaukwatApi.Models;
 using LookaukwatApi.Services;
 using LookaukwatApi.ViewModel;
@@ -60,28 +61,106 @@ namespace LookaukwatApi.Controllers
                 Price = s.Price
             }).OrderByDescending(o => o.id).ToList();
 
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
 
-            return r;
+            foreach (var item in r)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+            return Liste;
+
+          
         }
 
         [Route("api/Product/GetProductScrollView")]
-        public List<ProductForMobile> GetScrollViewProducts(int pageIndex, int pageSize)
+        public List<ProductForMobile> GetScrollViewProducts(int pageIndex, int pageSize, string sortBy)
         {
-            //var t = db.Products.ToList();
-            var r = db.Products.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            List<ProductForMobile> List = new List<ProductForMobile>();
+            switch (sortBy)
             {
-                Title = s.Title,
-                Town = s.Town,
-                DateAdd = s.DateAdd,
-                ViewNumber = s.ViewNumber,
-                Category = s.Category.CategoryName,
-                Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
-                id = s.id,
-                Price = s.Price
-            }).ToList();
+                case "MostRecent":
+                    List = db.Products.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+                    {
+                        Title = s.Title,
+                        Town = s.Town,
+                        DateAdd = s.DateAdd,
+                        ViewNumber = s.ViewNumber,
+                        Category = s.Category.CategoryName,
+                        Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                        id = s.id,
+                        Price = s.Price
+                    }).ToList();
+                    break;
 
+                case "MostOld":
+                    List = db.Products.OrderBy(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+                    {
+                        Title = s.Title,
+                        Town = s.Town,
+                        DateAdd = s.DateAdd,
+                        ViewNumber = s.ViewNumber,
+                        Category = s.Category.CategoryName,
+                        Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                        id = s.id,
+                        Price = s.Price
+                    }).ToList();
+                    break;
 
-            return r;
+                case "LowerPrice":
+                    List = db.Products.OrderBy(o => o.Price).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+                    {
+                        Title = s.Title,
+                        Town = s.Town,
+                        DateAdd = s.DateAdd,
+                        ViewNumber = s.ViewNumber,
+                        Category = s.Category.CategoryName,
+                        Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                        id = s.id,
+                        Price = s.Price
+                    }).ToList();
+                    break;
+
+                case "HeigherPrice":
+                    List = db.Products.OrderByDescending(o => o.Price).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+                    {
+                        Title = s.Title,
+                        Town = s.Town,
+                        DateAdd = s.DateAdd,
+                        ViewNumber = s.ViewNumber,
+                        Category = s.Category.CategoryName,
+                        Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                        id = s.id,
+                        Price = s.Price
+                    }).ToList();
+                    break;
+                default:
+                    List = db.Products.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+                    {
+                        Title = s.Title,
+                        Town = s.Town,
+                        DateAdd = s.DateAdd,
+                        ViewNumber = s.ViewNumber,
+                        Category = s.Category.CategoryName,
+                        Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                        id = s.id,
+                        Price = s.Price
+                    }).ToList();
+
+                    
+                    break;
+            }
+
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
+
+            foreach(var item in List)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+            return Liste;
         }
 
         [Route("api/Product/GetSearchProducts")]
@@ -113,7 +192,7 @@ namespace LookaukwatApi.Controllers
 
         [Route("api/Product/UploadImages")]
 
-        public async Task <string> PostUploadImagesProducts(int id)
+        public async Task <ImageProcductModel> PostUploadImagesProducts(int id)
         {
             try
             {
@@ -122,7 +201,8 @@ namespace LookaukwatApi.Controllers
                 {
                     var product = await db.Products.FindAsync(id);
                     string ImagePath = null;
-                    if(product != null)
+                    ImageProcductModel img = new ImageProcductModel();
+                    if (product != null)
                     foreach (string file in httpRequest.Files)
                     {
                         var poestedFile = httpRequest.Files[file];
@@ -139,7 +219,7 @@ namespace LookaukwatApi.Controllers
                             ImageProcductModel picture = new ImageProcductModel
                             {
                             Image = Image,
-                            ImageMobile = "https://lookaukwatapi.azurewebsites.net/" + Image,
+                            ImageMobile = "https://lookaukwatapi.azurewebsites.net" + Image,
                             id = Guid.NewGuid(),
                             ProductId = id
                         };
@@ -150,14 +230,14 @@ namespace LookaukwatApi.Controllers
                         poestedFile.SaveAs(FileName);
 
                             ImagePath = Image;
-                        
+                            img = picture;
                     }
 
                    await db.SaveChangesAsync();
 
-                    return ImagePath;
+                    return img;
                 }
-            }catch(Exception e) { return e.Message; }
+            }catch(Exception e) { Console.WriteLine(e); }
 
             return null;
         }
@@ -223,10 +303,14 @@ namespace LookaukwatApi.Controllers
 
         // Result list of product of Ask and offer search
         [Route("api/Product/GetAskAndOfferSearch")]
-        public async Task<List<ProductForMobile>> GetAskAndOfferSearch(string categori, string town, string searchOrAsk, int pageIndex, int pageSize)
+        public async Task<List<ProductForMobile>> GetAskAndOfferSearch(string categori, string town, string searchOrAsk, int pageIndex, int pageSize, string sortBy)
         {
+            var results = new List<ProductForMobile>();
 
-            var results = await db.Products.
+            switch (sortBy)
+            {
+                case "MostRecent":
+                    results = await db.Products.OrderByDescending(o => o.id).
               Select(s => new ProductForMobile
               {
                   Title = s.Title,
@@ -239,6 +323,69 @@ namespace LookaukwatApi.Controllers
                   Price = s.Price
               }).Where(m => m.SearchOrAsk == searchOrAsk)
               .ToListAsync();
+                    break;
+                case "MostOld":
+                    results = await db.Products.OrderBy(o => o.id).
+              Select(s => new ProductForMobile
+              {
+                  Title = s.Title,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAsk = s.SearchOrAskJob,
+                  Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                  id = s.id,
+                  DateAdd = s.DateAdd,
+                  Price = s.Price
+              }).Where(m => m.SearchOrAsk == searchOrAsk)
+              .ToListAsync();
+                    break;
+                case "LowerPrice":
+                    results = await db.Products.OrderBy(o => o.Price).
+              Select(s => new ProductForMobile
+              {
+                  Title = s.Title,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAsk = s.SearchOrAskJob,
+                  Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                  id = s.id,
+                  DateAdd = s.DateAdd,
+                  Price = s.Price
+              }).Where(m => m.SearchOrAsk == searchOrAsk)
+              .ToListAsync();
+                    break;
+                case "HeigherPrice":
+                    results = await db.Products.OrderByDescending(o => o.Price).
+              Select(s => new ProductForMobile
+              {
+                  Title = s.Title,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAsk = s.SearchOrAskJob,
+                  Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                  id = s.id,
+                  DateAdd = s.DateAdd,
+                  Price = s.Price
+              }).Where(m => m.SearchOrAsk == searchOrAsk)
+              .ToListAsync();
+                    break;
+                default:
+                    results = await db.Products.OrderByDescending(o => o.id).
+              Select(s => new ProductForMobile
+              {
+                  Title = s.Title,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAsk = s.SearchOrAskJob,
+                  Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                  id = s.id,
+                  DateAdd = s.DateAdd,
+                  Price = s.Price
+              }).Where(m => m.SearchOrAsk == searchOrAsk)
+              .ToListAsync();
+                    break;
+            }
+             
 
             if (!string.IsNullOrWhiteSpace(categori) && categori != "Toutes")
             {
@@ -250,8 +397,15 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => m.Town == town).ToList();
             }
 
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
 
-            return results.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).ToList();
+            foreach (var item in results)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+            return Liste.Skip(pageIndex * pageSize).Take(pageSize).ToList();
         }
 
 
@@ -285,10 +439,11 @@ namespace LookaukwatApi.Controllers
             return Ok(user);
         }
 
+        [HttpPost]
         [Route("api/Product/GetUserName")]
-        public async Task<string> GetUserName(string phone)
+        public async Task<string> GetUserName(UserPhoneViewModel Phone)
         {
-           var user = await db.Users.FirstOrDefaultAsync(e => e.PhoneNumber == phone);
+           var user = await db.Users.FirstOrDefaultAsync(e => e.PhoneNumber == Phone.phoneNumber);
             if (user == null)
                 return null;
             return user.Email;
@@ -402,6 +557,52 @@ namespace LookaukwatApi.Controllers
             await db.SaveChangesAsync();
 
             return Ok(productModel);
+        }
+
+        [HttpGet]
+        [Route("api/Product/GetImages")]
+        [Authorize]
+        public async Task<List<ImageModelView>> GetImageList(int ProductId)
+        {
+            return await db.Images.Where(im => im.ProductId == ProductId).Select(s => new ImageModelView
+            {
+                id = s.id,
+                ImageMobile = s.ImageMobile,
+            }).ToListAsync();
+        }
+
+        [HttpDelete]
+        [Route("api/Product/DeleteImages")]
+        [ResponseType(typeof(ImageProcductModel))]
+        [Authorize]
+        public async Task<IHttpActionResult> DeleteImage(Guid ImageId)
+        {
+            var img = await db.Images.FirstOrDefaultAsync(m =>m.id == ImageId);
+
+            if(img == null)
+            {
+                return NotFound();
+            }
+
+            string path;
+            if (img.Image.StartsWith("http"))
+            {
+                path = img.Image;
+            }
+            else
+            {
+                path = System.Web.Hosting.HostingEnvironment.MapPath(img.Image);
+            }
+
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+
+             db.Images.Remove(img);
+
+            var result = await db.SaveChangesAsync();
+            return Ok(img);
         }
 
         protected override void Dispose(bool disposing)

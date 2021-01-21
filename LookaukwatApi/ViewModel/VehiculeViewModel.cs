@@ -31,6 +31,7 @@ namespace LookaukwatApi.ViewModel
         [DisplayName("Quartier")]
         public string Street { get; set; }
         public DateTime DateAdd { get; set; }
+        public string Date { get; set; }
         //can change here
         [DisplayName("Rubrique")]
         public string RubriqueVehicule { get; set; }
@@ -56,6 +57,8 @@ namespace LookaukwatApi.ViewModel
         public string StateVehicule { get; set; }
         [DisplayName("Transmission")]
         public string GearBoxVehicule { get; set; }
+        public string Lat { get; set; }
+        public string Lon { get; set; }
         public string UserName { get; set; }
         public string UserPhone { get; set; }
         public string UserEmail { get; set; }

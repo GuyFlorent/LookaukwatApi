@@ -34,6 +34,7 @@ namespace LookaukwatApi.ViewModel
         public string Rubrique { get; set; }
         [DisplayName("Type")]
         public DateTime DateAdd { get; set; }
+        public string Date { get; set; }
         public string Type { get; set; }
         [DisplayName("Marque")]
         public string Brand { get; set; }
@@ -46,6 +47,9 @@ namespace LookaukwatApi.ViewModel
         public string Color { get; set; }
         [DisplayName("Etat")]
         public string State { get; set; }
+        public string Lat { get; set; }
+        public string Lon { get; set; }
+        public int ViewNumber { get; set; }
         public string UserName { get; set; }
         public string UserPhone { get; set; }
         public string UserEmail { get; set; }

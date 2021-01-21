@@ -15,7 +15,8 @@ namespace LookaukwatApi.ViewModel
         public int Price { get; set; }
      
         public DateTime DateAdd { get; set; }
-       
+        public string Date { get; set; }
+
         public string  Category { get; set; }
        
         public  string Image { get; set; }

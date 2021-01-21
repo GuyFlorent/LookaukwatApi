@@ -9,6 +9,7 @@ namespace LookaukwatApi.ViewModel
     {
         public Guid id { get; set; }
         public string Image { get; set; }
+        public string ImageMobile { get; set; }
         public List<HttpPostedFileBase> ImageFile { get; set; }
     }
 }

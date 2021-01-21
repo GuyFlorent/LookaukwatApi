@@ -53,6 +53,14 @@ namespace LookaukwatApi.Controllers
 
            }).ToList();
 
+            List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
+
+            foreach (var item in ListeSimilar)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
 
             HouseViewModel house = new HouseViewModel
             {
@@ -60,6 +68,7 @@ namespace LookaukwatApi.Controllers
                 Title = houseModel.Title,
                 Description = houseModel.Description,
                 DateAdd = houseModel.DateAdd,
+                Date = ConvertDate.Convert(houseModel.DateAdd),
                 Images = houseModel.Images.Select(s => s.ImageMobile).ToList(),
                 UserName = houseModel.User.FirstName,
                 UserEmail = houseModel.User.Email,
@@ -73,8 +82,10 @@ namespace LookaukwatApi.Controllers
                 StateHouse = houseModel.StateHouse,
                 TypeHouse = houseModel.TypeHouse,
                 Street = houseModel.Street,
-                SimilarProduct = ListeSimilar,
-                ViewNumber = houseModel.ViewNumber
+                SimilarProduct = Liste,
+                ViewNumber = houseModel.ViewNumber,
+                Lat = houseModel.Coordinate.Lat,
+                Lon = houseModel.Coordinate.Lon,
             };
 
 
@@ -143,28 +154,124 @@ namespace LookaukwatApi.Controllers
 
         // Result list House of Offer search House
         [Route("api/House/GetOfferHouseSearch")]
-        public async Task<List<ProductForMobile>> GetOfferHouseSearch(string categori, string town, string searchOrAskJob, int price, string rubriqueHouse, string typeHouse, string fabricMaterialHouse, string stateHouse, string colorHouse, int pageIndex, int pageSize)
+        public async Task<List<ProductForMobile>> GetOfferHouseSearch(string categori, string town, string searchOrAskJob, int price, string rubriqueHouse, string typeHouse, string fabricMaterialHouse, string stateHouse, string colorHouse, int pageIndex, int pageSize, string sortBy)
         {
+            List<SearchViewModel> results = new List<SearchViewModel>();
 
-            var results = await db.Houses.
-              Select(s => new SearchViewModel
-              {
-                  id = s.id,
-                  Title = s.Title,
-                  Images = s.Images,
-                  ViewNumber = s.ViewNumber,
-                  DateAdd = s.DateAdd,
-                  Category = s.Category.CategoryName,
-                  Town = s.Town,
-                  SearchOrAskJob = s.SearchOrAskJob,
-                  Price = s.Price,
-                  TypeHouse = s.TypeHouse,
-                  RubriqueHouse = s.RubriqueHouse,
-                  ColorHouse = s.ColorHouse,
-                  FabricMaterialHouse = s.FabricMaterialeHouse,
-                  StateHouse = s.StateHouse
+            switch (sortBy)
+            {
+                case "MostRecent":
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    results = await db.Houses.OrderByDescending(o => o.id).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                TypeHouse = s.TypeHouse,
+                RubriqueHouse = s.RubriqueHouse,
+                ColorHouse = s.ColorHouse,
+                FabricMaterialHouse = s.FabricMaterialeHouse,
+                StateHouse = s.StateHouse
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "MostOld":
+
+                    results = await db.Houses.OrderBy(o => o.id).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                TypeHouse = s.TypeHouse,
+                RubriqueHouse = s.RubriqueHouse,
+                ColorHouse = s.ColorHouse,
+                FabricMaterialHouse = s.FabricMaterialeHouse,
+                StateHouse = s.StateHouse
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "LowerPrice":
+
+                    results = await db.Houses.OrderBy(o => o.Price).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                TypeHouse = s.TypeHouse,
+                RubriqueHouse = s.RubriqueHouse,
+                ColorHouse = s.ColorHouse,
+                FabricMaterialHouse = s.FabricMaterialeHouse,
+                StateHouse = s.StateHouse
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "HeigherPrice":
+                    results = await db.Houses.OrderByDescending(o => o.Price).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                TypeHouse = s.TypeHouse,
+                RubriqueHouse = s.RubriqueHouse,
+                ColorHouse = s.ColorHouse,
+                FabricMaterialHouse = s.FabricMaterialeHouse,
+                StateHouse = s.StateHouse
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                default:
+
+                    results = await db.Houses.OrderByDescending(o =>o.id).
+             Select(s => new SearchViewModel
+             {
+                 id = s.id,
+                 Title = s.Title,
+                 Images = s.Images,
+                 ViewNumber = s.ViewNumber,
+                 DateAdd = s.DateAdd,
+                 Category = s.Category.CategoryName,
+                 Town = s.Town,
+                 SearchOrAskJob = s.SearchOrAskJob,
+                 Price = s.Price,
+                 TypeHouse = s.TypeHouse,
+                 RubriqueHouse = s.RubriqueHouse,
+                 ColorHouse = s.ColorHouse,
+                 FabricMaterialHouse = s.FabricMaterialeHouse,
+                 StateHouse = s.StateHouse
+
+             }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+            }
+
+            
 
             if (price >= 0 && price < 100000)
             {
@@ -201,8 +308,7 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => m.StateHouse == stateHouse).ToList();
             }
 
-
-            return results.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -213,6 +319,17 @@ namespace LookaukwatApi.Controllers
                 Price = s.Price,
                 ViewNumber = s.ViewNumber
             }).ToList();
+
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
+
+            foreach (var item in List)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+
+            return Liste;
         }
 
         // PUT: api/House/5
@@ -265,7 +382,7 @@ namespace LookaukwatApi.Controllers
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             houseModel.User = user;
-
+            houseModel.DateAdd = DateTime.UtcNow;
             if (houseModel.Coordinate == null || (houseModel.Coordinate != null &&
                 (houseModel.Coordinate.Lat == null || houseModel.Coordinate.Lon == null)))
             {

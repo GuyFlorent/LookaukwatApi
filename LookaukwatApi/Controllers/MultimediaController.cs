@@ -53,6 +53,14 @@ namespace LookaukwatApi.Controllers
 
            }).ToList();
 
+            List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
+
+            foreach (var item in ListeSimilar)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
 
             MultimediaViewModel multimedia = new MultimediaViewModel
             {
@@ -60,6 +68,7 @@ namespace LookaukwatApi.Controllers
                 Title = multimediaModel.Title,
                 Description = multimediaModel.Description,
                 DateAdd = multimediaModel.DateAdd,
+                Date = ConvertDate.Convert(multimediaModel.DateAdd),
                 Images = multimediaModel.Images.Select(s => s.ImageMobile).ToList(),
                 UserName = multimediaModel.User.FirstName,
                 UserEmail = multimediaModel.User.Email,
@@ -72,7 +81,9 @@ namespace LookaukwatApi.Controllers
                 Price = multimediaModel.Price,
                 Capacity = multimediaModel.Capacity,
                 Street = multimediaModel.Street,
-                SimilarProduct = ListeSimilar,
+                SimilarProduct = Liste,
+                Lat = multimediaModel.Coordinate.Lat,
+                Lon = multimediaModel.Coordinate.Lon,
                 ViewNumber = multimediaModel.ViewNumber
             };
 
@@ -133,27 +144,117 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Multimedia
         [Route("api/Multimedia/GetOfferMultiSearch")]
-        public async Task<List<ProductForMobile>> GetOfferMultiSearch(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity, int pageIndex, int pageSize)
+        public async Task<List<ProductForMobile>> GetOfferMultiSearch(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity, int pageIndex, int pageSize, string sortBy)
         {
+            List<SearchViewModel> results = new List<SearchViewModel>();
 
-            var results = await db.Multimedia.
-              Select(s => new SearchViewModel
-              {
-                  id = s.id,
-                  Title = s.Title,
-                  Images = s.Images,
-                  ViewNumber = s.ViewNumber,
-                  DateAdd = s.DateAdd,
-                  Category = s.Category.CategoryName,
-                  Town = s.Town,
-                  SearchOrAskJob = s.SearchOrAskJob,
-                  Price = s.Price,
-                  MultimediaBrand = s.Brand,
-                  MultimediaModel = s.Model,
-                  MultimediaRubrique = s.Type,
-                  MultimediaCapacity = s.Capacity
+            switch (sortBy)
+            {
+                case "MostRecent":
+                    results = await db.Multimedia.OrderByDescending(o => o.id).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                MultimediaBrand = s.Brand,
+                MultimediaModel = s.Model,
+                MultimediaRubrique = s.Type,
+                MultimediaCapacity = s.Capacity
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "MostOld":
+                    results = await db.Multimedia.OrderBy(o => o.id).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                MultimediaBrand = s.Brand,
+                MultimediaModel = s.Model,
+                MultimediaRubrique = s.Type,
+                MultimediaCapacity = s.Capacity
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "LowerPrice":
+                    results = await db.Multimedia.OrderBy(o => o.Price).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                MultimediaBrand = s.Brand,
+                MultimediaModel = s.Model,
+                MultimediaRubrique = s.Type,
+                MultimediaCapacity = s.Capacity
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "HeigherPrice":
+                    results = await db.Multimedia.OrderByDescending(o => o.Price).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                ViewNumber = s.ViewNumber,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                MultimediaBrand = s.Brand,
+                MultimediaModel = s.Model,
+                MultimediaRubrique = s.Type,
+                MultimediaCapacity = s.Capacity
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                default:
+
+                    results = await db.Multimedia.OrderByDescending(o => o.id).
+             Select(s => new SearchViewModel
+             {
+                 id = s.id,
+                 Title = s.Title,
+                 Images = s.Images,
+                 ViewNumber = s.ViewNumber,
+                 DateAdd = s.DateAdd,
+                 Category = s.Category.CategoryName,
+                 Town = s.Town,
+                 SearchOrAskJob = s.SearchOrAskJob,
+                 Price = s.Price,
+                 MultimediaBrand = s.Brand,
+                 MultimediaModel = s.Model,
+                 MultimediaRubrique = s.Type,
+                 MultimediaCapacity = s.Capacity
+
+             }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+
+                    break;
+            }
+
+            
 
             if (price >= 0 && price < 100000)
             {
@@ -185,7 +286,7 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => m.MultimediaCapacity == multimediaCapacity).ToList();
             }
 
-            return results.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -196,6 +297,17 @@ namespace LookaukwatApi.Controllers
                 Price = s.Price,
                 ViewNumber = s.ViewNumber
             }).ToList();
+
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
+
+            foreach (var item in List)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+
+            return Liste;
         }
 
         // PUT: api/Multimedia/5
@@ -247,7 +359,7 @@ namespace LookaukwatApi.Controllers
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             multimediaModel.User = user;
-
+            multimediaModel.DateAdd = DateTime.UtcNow;
             if (multimediaModel.Coordinate == null || (multimediaModel.Coordinate != null &&
                (multimediaModel.Coordinate.Lat == null || multimediaModel.Coordinate.Lon == null)))
             {

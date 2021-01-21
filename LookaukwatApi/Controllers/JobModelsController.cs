@@ -53,13 +53,22 @@ namespace LookaukwatApi.Controllers
 
             }).ToList();
 
-           
+            List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
+
+            foreach (var item in ListeSimilar)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+
             JobViewModel job = new JobViewModel 
             {
                 id = jobModel.id,
                 Title = jobModel.Title,
                 Description = jobModel.Description,
                 DateAdd = jobModel.DateAdd,
+                Date = ConvertDate.Convert(jobModel.DateAdd),
                 Images = jobModel.Images,
                 User = jobModel.User,
                 Town = jobModel.Town,
@@ -68,8 +77,10 @@ namespace LookaukwatApi.Controllers
             SearchOrAskJob = jobModel.SearchOrAskJob,
             Price = jobModel.Price,
             Street = jobModel.Street,
-            SimilarProduct = ListeSimilar,
-            ViewNumber = jobModel.ViewNumber
+            SimilarProduct = Liste,
+            ViewNumber = jobModel.ViewNumber,
+                Lat = jobModel.Coordinate.Lat,
+                Lon = jobModel.Coordinate.Lon,
             };
 
             return Ok(job);
@@ -154,10 +165,13 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Job
         [Route("api/JobModels/GetOfferJobSearch")]
-        public async Task<List<ProductForMobile>> GetOfferJobSearch(string categori, string town, string searchOrAskJob, string typeContract, string activitySector, int price, int pageIndex, int pageSize)
+        public async Task<List<ProductForMobile>> GetOfferJobSearch(string categori, string town, string searchOrAskJob, string typeContract, string activitySector, int price, int pageIndex, int pageSize, string sortBy)
         {
-
-            var results = await db.Jobs.
+            List<SearchViewModel> results = new List<SearchViewModel>();
+            switch (sortBy)
+            {
+                case "MostRecent":
+                    results = await db.Jobs.OrderByDescending(o => o.id).
               Select(s => new SearchViewModel
               {
                   id = s.id,
@@ -174,6 +188,84 @@ namespace LookaukwatApi.Controllers
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
+                    break;
+                case "MostOld":
+                    results = await db.Jobs.OrderBy(o => o.id).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  TypeContract = s.TypeContract,
+                  ActivitySector = s.ActivitySector
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "LowerPrice":
+                    results = await db.Jobs.OrderBy(o => o.Price).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  TypeContract = s.TypeContract,
+                  ActivitySector = s.ActivitySector
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "HeigherPrice":
+                    results = await db.Jobs.OrderByDescending(o => o.Price).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  TypeContract = s.TypeContract,
+                  ActivitySector = s.ActivitySector
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                default:
+                    results = await db.Jobs.OrderByDescending(o=>o.id).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  TypeContract = s.TypeContract,
+                  ActivitySector = s.ActivitySector
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+
+                    break;
+            }
+
+
+             
             if (price >= 0)
             {
                 results = results.Where(m => m.Price <= price).ToList();
@@ -195,7 +287,7 @@ namespace LookaukwatApi.Controllers
             }
 
 
-            return results.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -206,6 +298,17 @@ namespace LookaukwatApi.Controllers
                 Price = s.Price,
                 ViewNumber = s.ViewNumber
             }).ToList();
+
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
+
+            foreach (var item in List)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+
+            return Liste;
         }
 
 
@@ -227,7 +330,7 @@ namespace LookaukwatApi.Controllers
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png",ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
            jobModel.User = user;
-
+            jobModel.DateAdd = DateTime.UtcNow;
             if (jobModel.Coordinate == null || (jobModel.Coordinate != null &&
                 (jobModel.Coordinate.Lat == null || jobModel.Coordinate.Lon == null)))
             {

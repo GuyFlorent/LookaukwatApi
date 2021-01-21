@@ -33,6 +33,7 @@ namespace LookaukwatApi.ViewModel
         public int ApartSurface { get; set; }
         [DisplayName("Type")]
         public DateTime DateAdd { get; set; }
+        public string Date { get; set; }
         public string Type { get; set; }
         [DisplayName("Nombre de pièces")]
         public int RoomNumber { get; set; }
@@ -41,6 +42,8 @@ namespace LookaukwatApi.ViewModel
         public string UserName { get; set; }
         public string UserPhone { get; set; }
         public string UserEmail { get; set; }
+        public string Lat { get; set; }
+        public string Lon { get; set; }
         public int ViewNumber { get; set; }
         public List<string> Images { get; set; }
         public List<SimilarProductViewModel> SimilarProduct { get; set; }

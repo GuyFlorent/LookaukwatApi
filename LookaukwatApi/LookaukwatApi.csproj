@@ -269,6 +269,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
+    <Compile Include="Services\ConvertDate.cs" />
     <Compile Include="Services\CoordonateService.cs" />
     <Compile Include="Services\ImageService.cs" />
     <Compile Include="Services\SendGridService.cs" />
@@ -283,6 +284,7 @@
     <Compile Include="ViewModel\ProductForMobile.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\SimilarProductViewModel.cs" />
+    <Compile Include="ViewModel\UserPhoneViewModel.cs" />
     <Compile Include="ViewModel\VehiculeViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

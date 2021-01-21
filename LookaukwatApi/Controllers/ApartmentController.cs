@@ -53,6 +53,13 @@ namespace LookaukwatApi.Controllers
 
             }).ToList();
 
+            List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
+
+            foreach (var item in ListeSimilar)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
 
             ApartViewModel apart = new ApartViewModel
             {
@@ -60,6 +67,7 @@ namespace LookaukwatApi.Controllers
                 Title = apartmentRentalModel.Title,
                 Description = apartmentRentalModel.Description,
                 DateAdd = apartmentRentalModel.DateAdd,
+                Date = ConvertDate.Convert(apartmentRentalModel.DateAdd),
                 Images = apartmentRentalModel.Images.Select(s => s.ImageMobile).ToList(),
                 UserName = apartmentRentalModel.User.FirstName,
                 UserEmail = apartmentRentalModel.User.Email,
@@ -72,8 +80,10 @@ namespace LookaukwatApi.Controllers
                 Price = apartmentRentalModel.Price,
                 RoomNumber = apartmentRentalModel.RoomNumber,
                 Street = apartmentRentalModel.Street,
-                SimilarProduct = ListeSimilar,
-                ViewNumber = apartmentRentalModel.ViewNumber
+                SimilarProduct = Liste,
+                ViewNumber = apartmentRentalModel.ViewNumber,
+                Lat = apartmentRentalModel.Coordinate.Lat,
+                Lon = apartmentRentalModel.Coordinate.Lon,
             };
 
             return Ok(apart);
@@ -139,27 +149,120 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Apartment
         [Route("api/Apartment/GetOfferAppartSearch")]
-        public async Task<List<ProductForMobile>> GetOfferAppartSearch(string categori, string town, string searchOrAskJob, int price, int roomNumberAppart, string furnitureOrNotAppart, string typeAppart, int apartSurfaceAppart, int pageIndex, int pageSize)
+        public async Task<List<ProductForMobile>> GetOfferAppartSearch(string categori, string town, string searchOrAskJob, int price, int roomNumberAppart, string furnitureOrNotAppart, string typeAppart, int apartSurfaceAppart, int pageIndex, int pageSize, string sortBy)
         {
+            List<SearchViewModel> results = new List<SearchViewModel>();
 
-            var results = await db.ApartmentRentals.
-              Select(s => new SearchViewModel
-              {
-                  id = s.id,
-                  Title = s.Title,
-                  Images = s.Images,
-                  DateAdd = s.DateAdd,
-                  Category = s.Category.CategoryName,
-                  Town = s.Town,
-                  SearchOrAskJob = s.SearchOrAskJob,
-                  Price = s.Price,
-                  RoomNumberAppart = s.RoomNumber,
-                  FurnitureOrNotAppart = s.FurnitureOrNot,
-                  TypeAppart = s.Type,
-                  ApartSurfaceAppart = s.ApartSurface,
-                  ViewNumber = s.ViewNumber
+            switch (sortBy)
+            {
+                case "MostRecent":
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    results = await db.ApartmentRentals.OrderByDescending(o => o.id).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                RoomNumberAppart = s.RoomNumber,
+                FurnitureOrNotAppart = s.FurnitureOrNot,
+                TypeAppart = s.Type,
+                ApartSurfaceAppart = s.ApartSurface,
+                ViewNumber = s.ViewNumber
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "MostOld":
+
+                    results = await db.ApartmentRentals.OrderBy(o => o.id).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                RoomNumberAppart = s.RoomNumber,
+                FurnitureOrNotAppart = s.FurnitureOrNot,
+                TypeAppart = s.Type,
+                ApartSurfaceAppart = s.ApartSurface,
+                ViewNumber = s.ViewNumber
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "LowerPrice":
+
+                    results = await db.ApartmentRentals.OrderBy(o => o.Price).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                RoomNumberAppart = s.RoomNumber,
+                FurnitureOrNotAppart = s.FurnitureOrNot,
+                TypeAppart = s.Type,
+                ApartSurfaceAppart = s.ApartSurface,
+                ViewNumber = s.ViewNumber
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "HeigherPrice":
+
+                    results = await db.ApartmentRentals.OrderByDescending(o => o.Price).
+            Select(s => new SearchViewModel
+            {
+                id = s.id,
+                Title = s.Title,
+                Images = s.Images,
+                DateAdd = s.DateAdd,
+                Category = s.Category.CategoryName,
+                Town = s.Town,
+                SearchOrAskJob = s.SearchOrAskJob,
+                Price = s.Price,
+                RoomNumberAppart = s.RoomNumber,
+                FurnitureOrNotAppart = s.FurnitureOrNot,
+                TypeAppart = s.Type,
+                ApartSurfaceAppart = s.ApartSurface,
+                ViewNumber = s.ViewNumber
+
+            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                default:
+
+                    results = await db.ApartmentRentals.OrderByDescending(o =>o.id).
+             Select(s => new SearchViewModel
+             {
+                 id = s.id,
+                 Title = s.Title,
+                 Images = s.Images,
+                 DateAdd = s.DateAdd,
+                 Category = s.Category.CategoryName,
+                 Town = s.Town,
+                 SearchOrAskJob = s.SearchOrAskJob,
+                 Price = s.Price,
+                 RoomNumberAppart = s.RoomNumber,
+                 FurnitureOrNotAppart = s.FurnitureOrNot,
+                 TypeAppart = s.Type,
+                 ApartSurfaceAppart = s.ApartSurface,
+                 ViewNumber = s.ViewNumber
+
+             }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+            }
+
+            
 
             if (!string.IsNullOrWhiteSpace(typeAppart) && typeAppart != "Tout")
             {
@@ -194,9 +297,9 @@ namespace LookaukwatApi.Controllers
 
 
 
+           
 
-
-            return results.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -206,7 +309,18 @@ namespace LookaukwatApi.Controllers
                 id = s.id,
                 Price = s.Price,
                 ViewNumber = s.ViewNumber
-            }).ToList(); 
+            }).ToList();
+
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
+
+            foreach (var item in List)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+
+            return Liste;
         }
 
 
@@ -260,8 +374,8 @@ namespace LookaukwatApi.Controllers
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             apartmentRentalModel.User = user;
-
-            if(apartmentRentalModel.Coordinate == null || (apartmentRentalModel.Coordinate != null &&
+            apartmentRentalModel.DateAdd = DateTime.UtcNow;
+            if (apartmentRentalModel.Coordinate == null || (apartmentRentalModel.Coordinate != null &&
                 (apartmentRentalModel.Coordinate.Lat == null || apartmentRentalModel.Coordinate.Lon == null)))
             {
                 apartmentRentalModel.Coordinate = await CoordonateService.GetCoodinateAsync(apartmentRentalModel.Town, apartmentRentalModel.Street);

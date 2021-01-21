@@ -31,6 +31,7 @@ namespace LookaukwatApi.ViewModel
         [DisplayName("Quartier")]
         public string Street { get; set; }
         public DateTime DateAdd { get; set; }
+        public string Date { get; set; }
         //can change here
         [DisplayName("Rubrique")]
         public string Type { get; set; }
@@ -44,6 +45,8 @@ namespace LookaukwatApi.ViewModel
         public string UserName { get; set; }
         public string UserPhone { get; set; }
         public string UserEmail { get; set; }
+        public string Lat { get; set; }
+        public string Lon { get; set; }
         public List<string> Images { get; set; }
         public List<SimilarProductViewModel> SimilarProduct { get; set; }
     }

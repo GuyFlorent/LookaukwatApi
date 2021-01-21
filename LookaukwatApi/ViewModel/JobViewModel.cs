@@ -24,10 +24,13 @@ namespace LookaukwatApi.ViewModel
         public int Price { get; set; }
         [DisplayName("Date d'ajout")]
         public DateTime DateAdd { get; set; }
+        public string Date { get; set; }
         [DisplayName("J'offre/Je recherche")]
         public string SearchOrAskJob { get; set; }
         [DisplayName("Nombre de vues")]
         public int ViewNumber { get; set; }
+        public string Lat { get; set; }
+        public string Lon { get; set; }
         public virtual CategoryModel Category { get; set; }
         public virtual ApplicationUser User { get; set; }
         public virtual ProductCoordinateModel Coordinate { get; set; }

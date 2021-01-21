@@ -53,6 +53,13 @@ namespace LookaukwatApi.Controllers
 
           }).ToList();
 
+            List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
+
+            foreach (var item in ListeSimilar)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
 
             VehiculeViewModel vehicule = new VehiculeViewModel
             {
@@ -60,6 +67,7 @@ namespace LookaukwatApi.Controllers
                 Title = vehiculeModel.Title,
                 Description = vehiculeModel.Description,
                 DateAdd = vehiculeModel.DateAdd,
+                Date = ConvertDate.Convert(vehiculeModel.DateAdd),
                 Images = vehiculeModel.Images.Select(s => s.ImageMobile).ToList(),
                 UserName = vehiculeModel.User.FirstName,
                 UserEmail = vehiculeModel.User.Email,
@@ -80,8 +88,10 @@ namespace LookaukwatApi.Controllers
                 TypeVehicule = vehiculeModel.TypeVehicule,
                 YearVehicule = vehiculeModel.YearVehicule,
                 Street = vehiculeModel.Street,
-                SimilarProduct = ListeSimilar,
-                ViewNumber = vehiculeModel.ViewNumber
+                SimilarProduct = Liste,
+                ViewNumber = vehiculeModel.ViewNumber,
+                Lat = vehiculeModel.Coordinate.Lat,
+                Lon = vehiculeModel.Coordinate.Lon,
             };
 
             return Ok(vehicule);
@@ -185,10 +195,13 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Vehicule
         [Route("api/Vehicule/GetOfferVehiculeSearch")]
-        public async Task<List<ProductForMobile>> GetOfferVehiculeSearch(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color, int pageIndex, int pageSize)
+        public async Task<List<ProductForMobile>> GetOfferVehiculeSearch(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color, int pageIndex, int pageSize, string sortBy)
         {
-
-            var results = await db.Vehicules.
+            List<SearchViewModel> results = new List<SearchViewModel>();
+            switch (sortBy)
+            {
+                case "MostRecent":
+                    results = await db.Vehicules.OrderByDescending(o => o.id).
               Select(s => new SearchViewModel
               {
                   id = s.id,
@@ -213,6 +226,121 @@ namespace LookaukwatApi.Controllers
                   VehiculeRubrique = s.RubriqueVehicule
 
               }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "MostOld":
+                    results = await db.Vehicules.OrderBy(o => o.id).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  VehiculeBrand = s.BrandVehicule,
+                  VehiculeModel = s.ModelVehicule,
+                  VehiculeType = s.TypeVehicule,
+                  Petrol = s.PetrolVehicule,
+                  Year = s.YearVehicule,
+                  Mileage = s.MileageVehicule,
+                  NumberOfDoor = s.NumberOfDoorVehicule,
+                  GearBox = s.GearBoxVehicule,
+                  Color = s.ColorVehicule,
+                  Vehiculestate = s.StateVehicule,
+                  VehiculeRubrique = s.RubriqueVehicule
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "LowerPrice":
+
+                    results = await db.Vehicules.OrderBy(o => o.Price).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  VehiculeBrand = s.BrandVehicule,
+                  VehiculeModel = s.ModelVehicule,
+                  VehiculeType = s.TypeVehicule,
+                  Petrol = s.PetrolVehicule,
+                  Year = s.YearVehicule,
+                  Mileage = s.MileageVehicule,
+                  NumberOfDoor = s.NumberOfDoorVehicule,
+                  GearBox = s.GearBoxVehicule,
+                  Color = s.ColorVehicule,
+                  Vehiculestate = s.StateVehicule,
+                  VehiculeRubrique = s.RubriqueVehicule
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                case "HeigherPrice":
+
+                    results = await db.Vehicules.OrderByDescending(o => o.Price).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  VehiculeBrand = s.BrandVehicule,
+                  VehiculeModel = s.ModelVehicule,
+                  VehiculeType = s.TypeVehicule,
+                  Petrol = s.PetrolVehicule,
+                  Year = s.YearVehicule,
+                  Mileage = s.MileageVehicule,
+                  NumberOfDoor = s.NumberOfDoorVehicule,
+                  GearBox = s.GearBoxVehicule,
+                  Color = s.ColorVehicule,
+                  Vehiculestate = s.StateVehicule,
+                  VehiculeRubrique = s.RubriqueVehicule
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+                default:
+
+                    results = await db.Vehicules.OrderByDescending(o =>o.id).
+              Select(s => new SearchViewModel
+              {
+                  id = s.id,
+                  Title = s.Title,
+                  Images = s.Images,
+                  ViewNumber = s.ViewNumber,
+                  DateAdd = s.DateAdd,
+                  Category = s.Category.CategoryName,
+                  Town = s.Town,
+                  SearchOrAskJob = s.SearchOrAskJob,
+                  Price = s.Price,
+                  VehiculeBrand = s.BrandVehicule,
+                  VehiculeModel = s.ModelVehicule,
+                  VehiculeType = s.TypeVehicule,
+                  Petrol = s.PetrolVehicule,
+                  Year = s.YearVehicule,
+                  Mileage = s.MileageVehicule,
+                  NumberOfDoor = s.NumberOfDoorVehicule,
+                  GearBox = s.GearBoxVehicule,
+                  Color = s.ColorVehicule,
+                  Vehiculestate = s.StateVehicule,
+                  VehiculeRubrique = s.RubriqueVehicule
+
+              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                    break;
+            }
+
+             
 
             if (!string.IsNullOrWhiteSpace(vehiculeRubrique) && vehiculeRubrique != "Toutes")
             {
@@ -276,7 +404,7 @@ namespace LookaukwatApi.Controllers
             }
 
 
-            return results.OrderByDescending(o => o.id).Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -287,6 +415,17 @@ namespace LookaukwatApi.Controllers
                 Price = s.Price,
                 ViewNumber = s.ViewNumber
             }).ToList();
+
+            List<ProductForMobile> Liste = new List<ProductForMobile>();
+
+            foreach (var item in List)
+            {
+                item.Date = ConvertDate.Convert(item.DateAdd);
+                Liste.Add(item);
+            }
+
+
+            return Liste;
         }
 
         // PUT: api/Vehicule/5
@@ -338,7 +477,7 @@ namespace LookaukwatApi.Controllers
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             vehiculeModel.User = user;
-
+            vehiculeModel.DateAdd = DateTime.UtcNow;
             if (vehiculeModel.Coordinate == null || (vehiculeModel.Coordinate != null &&
                (vehiculeModel.Coordinate.Lat == null || vehiculeModel.Coordinate.Lon == null)))
             {
