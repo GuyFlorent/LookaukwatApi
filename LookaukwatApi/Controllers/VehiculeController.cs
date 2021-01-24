@@ -97,6 +97,39 @@ namespace LookaukwatApi.Controllers
             return Ok(vehicule);
         }
 
+        [HttpGet]
+        [Route("api/Vehicule/GetVehiculediaCritere")]
+        [ResponseType(typeof(VehiculeViewModel))]
+        public async Task<IHttpActionResult> GetVehiculediaCritere(int id)
+        {
+            VehiculeModel Vehi = await db.Vehicules.FindAsync(id);
+            if (Vehi == null)
+            {
+                return NotFound();
+            }
+
+            VehiculeViewModel vehicule = new VehiculeViewModel
+            {
+                id = Vehi.id,
+                Price = Vehi.Price,
+                SearchOrAsk = Vehi.SearchOrAskJob,
+                RubriqueVehicule = Vehi.RubriqueVehicule,
+                BrandVehicule = Vehi.BrandVehicule,
+                TypeVehicule = Vehi.TypeVehicule,
+                ColorVehicule = Vehi.ColorVehicule,
+                YearVehicule = Vehi.YearVehicule,
+                FirstYearVehicule = Vehi.FirstYearVehicule,
+                MileageVehicule = Vehi.MileageVehicule,
+                NumberOfDoorVehicule = Vehi.NumberOfDoorVehicule,
+                GearBoxVehicule = Vehi.GearBoxVehicule,
+                ModelVehicule = Vehi.ModelVehicule,
+                StateVehicule = Vehi.StateVehicule,
+                PetrolVehicule = Vehi.PetrolVehicule
+
+            };
+            return Ok(vehicule);
+        }
+
         // Result of Offer search Vehicule
         [Route("api/Vehicule/GetOfferVehiculeSearchNumber")]
         public async Task<int> GetOfferVehiculeSearchNumber(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color)
@@ -430,7 +463,7 @@ namespace LookaukwatApi.Controllers
 
         // PUT: api/Vehicule/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutVehiculeModel(int id, VehiculeModel vehiculeModel)
+        public async Task<IHttpActionResult> PutVehiculeModel(int id, VehiculeCritereViewModel vehiculeModel)
         {
             if (!ModelState.IsValid)
             {
@@ -442,7 +475,27 @@ namespace LookaukwatApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(vehiculeModel).State = EntityState.Modified;
+            var vehicule = await db.Vehicules.FirstOrDefaultAsync(m => m.id == id);
+
+
+            vehicule.Price = vehiculeModel.Price;
+            vehicule.SearchOrAskJob = vehiculeModel.SearchOrAsk;
+            vehicule.RubriqueVehicule = vehiculeModel.RubriqueVehicule;
+            vehicule.TypeVehicule = vehiculeModel.TypeVehicule;
+            vehicule.BrandVehicule = vehiculeModel.BrandVehicule;
+            vehicule.PetrolVehicule = vehiculeModel.PetrolVehicule;
+            vehicule.ModelVehicule = vehiculeModel.ModelVehicule;
+            vehicule.YearVehicule = vehiculeModel.YearVehicule;
+            vehicule.FirstYearVehicule = vehiculeModel.FirstYearVehicule;
+            vehicule.GearBoxVehicule = vehiculeModel.GearBoxVehicule;
+            vehicule.MileageVehicule = vehiculeModel.MileageVehicule;
+            vehicule.NumberOfDoorVehicule = vehiculeModel.NumberOfDoorVehicule;
+            vehicule.ColorVehicule = vehiculeModel.ColorVehicule;
+            vehicule.StateVehicule = vehiculeModel.StateVehicule;
+
+
+
+            db.Entry(vehicule).State = EntityState.Modified;
 
             try
             {

@@ -92,6 +92,37 @@ namespace LookaukwatApi.Controllers
             return Ok(house);
         }
 
+
+
+
+        [HttpGet]
+        [Route("api/House/GetHouseCritere")]
+        [ResponseType(typeof(HouseViewModel))]
+        public async Task<IHttpActionResult> GetHouseCritere(int id)
+        {
+            HouseModel HouseModel = await db.Houses.FindAsync(id);
+            if (HouseModel == null)
+            {
+                return NotFound();
+            }
+
+            HouseViewModel house = new HouseViewModel
+            {
+                id = HouseModel.id,
+                RubriqueHouse = HouseModel.RubriqueHouse,
+                FabricMaterialeHouse = HouseModel.FabricMaterialeHouse,
+                TypeHouse = HouseModel.TypeHouse,
+                SearchOrAsk = HouseModel.SearchOrAskJob,
+                ColorHouse = HouseModel.ColorHouse,
+                StateHouse = HouseModel.StateHouse,
+                Price = HouseModel.Price
+
+            };
+            return Ok(house);
+        }
+
+
+
         // Result of Offer search House
         [Route("api/House/GetOfferHouseSearchNumber")]
         public async Task<int> GetOfferHouseSearchNumber(string categori, string town, string searchOrAskJob, int price, string rubriqueHouse, string typeHouse, string fabricMaterialHouse, string stateHouse, string colorHouse)
@@ -334,7 +365,7 @@ namespace LookaukwatApi.Controllers
 
         // PUT: api/House/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutHouseModel(int id, HouseModel houseModel)
+        public async Task<IHttpActionResult> PutHouseModel(int id, HouseCritereViewModel houseModel)
         {
             if (!ModelState.IsValid)
             {
@@ -346,7 +377,19 @@ namespace LookaukwatApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(houseModel).State = EntityState.Modified;
+            var House = await db.Houses.FirstOrDefaultAsync(m => m.id == id);
+
+
+            House.SearchOrAskJob = houseModel.SearchOrAskJob;
+            House.Price = houseModel.Price;
+            House.RubriqueHouse = houseModel.RubriqueHouse;
+            House.TypeHouse = houseModel.TypeHouse;
+            House.ColorHouse = houseModel.ColorHouse;
+            House.StateHouse = houseModel.StateHouse;
+            House.FabricMaterialeHouse = houseModel.FabricMaterialeHouse;
+            
+
+            db.Entry(House).State = EntityState.Modified;
 
             try
             {

@@ -94,6 +94,35 @@ namespace LookaukwatApi.Controllers
             return Ok(mode);
         }
 
+
+        [HttpGet]
+        [Route("api/Mode/GetModeCritere")]
+        [ResponseType(typeof(ModeViewModel))]
+        public async Task<IHttpActionResult> GetModeCritere(int id)
+        {
+            ModeModel Mode = await db.Modes.FindAsync(id);
+            if (Mode == null)
+            {
+                return NotFound();
+            }
+
+            ModeViewModel mode = new ModeViewModel
+            {
+                id = Mode.id,
+                Price = Mode.Price,
+                SearchOrAsk = Mode.SearchOrAskJob,
+                Rubrique = Mode.RubriqueMode,
+                Brand = Mode.BrandMode,
+                Type = Mode.TypeMode,
+                Univers = Mode.UniversMode,
+                Size = Mode.SizeMode,
+                Color = Mode.ColorMode,
+                State = Mode.StateMode
+               
+            };
+            return Ok(mode);
+        }
+
         // Result of Offer search Mode
         [Route("api/Mode/GetOfferModeSearchNumber")]
         public async Task<int> GetOfferModeSearchNumber(string categori, string town, string searchOrAskJob, int price, string rubriqueMode, string typeMode, string brandMode, string universMode, string sizeMode, string state, string colorMode)
@@ -370,7 +399,7 @@ namespace LookaukwatApi.Controllers
 
         // PUT: api/Mode/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutModeModel(int id, ModeModel modeModel)
+        public async Task<IHttpActionResult> PutModeModel(int id, ModeCritereViewModel modeModel)
         {
             if (!ModelState.IsValid)
             {
@@ -382,7 +411,20 @@ namespace LookaukwatApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(modeModel).State = EntityState.Modified;
+            var mode = await db.Modes.FirstOrDefaultAsync(m => m.id == id);
+
+
+            mode.SearchOrAskJob = modeModel.SearchOrAsk;
+            mode.RubriqueMode = modeModel.Rubrique;
+            mode.BrandMode = modeModel.Brand;
+            mode.TypeMode = modeModel.Type;
+            mode.UniversMode = modeModel.Univers;
+            mode.SizeMode = modeModel.Size;
+            mode.ColorMode = modeModel.Color;
+            mode.StateMode = modeModel.State;
+            mode.Price = modeModel.Price;
+
+            db.Entry(mode).State = EntityState.Modified;
 
             try
             {

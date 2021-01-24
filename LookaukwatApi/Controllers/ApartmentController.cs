@@ -89,6 +89,31 @@ namespace LookaukwatApi.Controllers
             return Ok(apart);
         }
 
+        [HttpGet]
+        [Route("api/Apartment/GetApartCritere")]
+        [ResponseType(typeof(ApartViewModel))]
+        public async Task<IHttpActionResult> GetApartCritere(int id)
+        {
+            ApartmentRentalModel apartmentRentalModel = await db.ApartmentRentals.FindAsync(id);
+            if (apartmentRentalModel == null)
+            {
+                return NotFound();
+            }
+
+            ApartViewModel apart = new ApartViewModel
+            {
+                id = apartmentRentalModel.id,
+                Type = apartmentRentalModel.Type,
+                RoomNumber = apartmentRentalModel.RoomNumber,
+                ApartSurface = apartmentRentalModel.ApartSurface,
+                SearchOrAsk = apartmentRentalModel.SearchOrAskJob,
+                FurnitureOrNot = apartmentRentalModel.FurnitureOrNot,
+                Price = apartmentRentalModel.Price
+
+            };
+            return Ok(apart);
+        }
+
 
         // Result of Offer search Apartment
         [Route("api/Apartment/GetOfferAppartSearchNumber")]
@@ -326,7 +351,7 @@ namespace LookaukwatApi.Controllers
 
         // PUT: api/Apartment/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutApartmentRentalModel(int id, ApartmentRentalModel apartmentRentalModel)
+        public async Task<IHttpActionResult> PutApartmentRentalModel(int id, ApartCritereViewModel apartmentRentalModel)
         {
             if (!ModelState.IsValid)
             {
@@ -338,7 +363,18 @@ namespace LookaukwatApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(apartmentRentalModel).State = EntityState.Modified;
+            var apart = await db.ApartmentRentals.FirstOrDefaultAsync(m => m.id == id);
+
+
+            apart.SearchOrAskJob = apartmentRentalModel.SearchOrAsk;
+            apart.Price = apartmentRentalModel.Price;
+            apart.Type = apartmentRentalModel.Type;
+            apart.RoomNumber = apartmentRentalModel.RoomNumber;
+            apart.FurnitureOrNot = apartmentRentalModel.FurnitureOrNot;
+            apart.ApartSurface = apartmentRentalModel.ApartSurface;
+            
+
+            db.Entry(apart).State = EntityState.Modified;
 
             try
             {

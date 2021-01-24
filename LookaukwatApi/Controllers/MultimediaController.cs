@@ -90,6 +90,31 @@ namespace LookaukwatApi.Controllers
             return Ok(multimedia);
         }
 
+        [HttpGet]
+        [Route("api/Multimedia/GetMultimediaCritere")]
+        [ResponseType(typeof(MultimediaViewModel))]
+        public async Task<IHttpActionResult> GetMultimediaCritere(int id)
+        {
+            MultimediaModel Mode = await db.Multimedia.FindAsync(id);
+            if (Mode == null)
+            {
+                return NotFound();
+            }
+
+            MultimediaViewModel multi = new MultimediaViewModel
+            {
+                id = Mode.id,
+                Price = Mode.Price,
+                SearchOrAsk = Mode.SearchOrAskJob,
+                 Type = Mode.Type,
+                Brand = Mode.Brand,
+                Model = Mode.Model,
+                Capacity = Mode.Capacity,
+                
+            };
+            return Ok(multi);
+        }
+
         // Result of Offer search Multimedia
         [Route("api/Multimedia/GetOfferMultiSearchNumber")]
         public async Task<int> GetOfferMultiSearchNumber(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity)
@@ -312,7 +337,7 @@ namespace LookaukwatApi.Controllers
 
         // PUT: api/Multimedia/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutMultimediaModel(int id, MultimediaModel multimediaModel)
+        public async Task<IHttpActionResult> PutMultimediaModel(int id, MultimediaCritereViewModel multimediaModel)
         {
             if (!ModelState.IsValid)
             {
@@ -323,8 +348,19 @@ namespace LookaukwatApi.Controllers
             {
                 return BadRequest();
             }
+            var multi = await db.Multimedia.FirstOrDefaultAsync(m => m.id == id);
 
-            db.Entry(multimediaModel).State = EntityState.Modified;
+
+            multi.Price = multimediaModel.Price;
+            multi.SearchOrAskJob = multimediaModel.SearchOrAsk;
+            multi.Type = multimediaModel.Type;
+            multi.Brand = multimediaModel.Brand;
+            multi.Capacity = multimediaModel.Capacity;
+            multi.Model = multimediaModel.Model;
+           
+
+
+            db.Entry(multi).State = EntityState.Modified;
 
             try
             {

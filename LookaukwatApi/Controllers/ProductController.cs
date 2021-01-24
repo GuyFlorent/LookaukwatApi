@@ -422,6 +422,28 @@ namespace LookaukwatApi.Controllers
             return Ok(productModel);
         }
 
+
+        // GET: api//5
+        [ResponseType(typeof(ProductModel))]
+        [Route("api/Product/GetProductWithSameParm")]
+        public async Task<IHttpActionResult> GetProductSameParm(int id)
+        {
+            ProductModel productModel = await db.Products.FindAsync(id);
+            if (productModel == null)
+            {
+                return NotFound();
+            }
+            ProductViewModel prod = new ProductViewModel()
+            {
+                id = productModel.id,
+                Title = productModel.Title,
+                Description = productModel.Description,
+                Town = productModel.Town,
+                Street = productModel.Street
+            };
+            return Ok(prod);
+        }
+
         //For user checking
         [ResponseType(typeof(ApplicationUser))]
         [Authorize]
@@ -475,7 +497,7 @@ namespace LookaukwatApi.Controllers
 
         // PUT: api/Product/5
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutProductModel(int id, ProductModel productModel)
+        public async Task<IHttpActionResult> PutProductModel(int id, ProductViewModel productModel)
         {
             if (!ModelState.IsValid)
             {
@@ -487,7 +509,27 @@ namespace LookaukwatApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(productModel).State = EntityState.Modified;
+            var prod = await db.Products.FirstOrDefaultAsync(m => m.id == id);
+
+
+            prod.Title = productModel.Title;
+            prod.Description = productModel.Description;
+            prod.Town = productModel.Town;
+            prod.Street = productModel.Street;
+
+            if (productModel.Coordinate == null || (productModel.Coordinate != null &&
+               (productModel.Coordinate.Lat == null || productModel.Coordinate.Lon == null)))
+            {
+                prod.Coordinate = await CoordonateService.GetCoodinateAsync(productModel.Town, productModel.Street);
+            }
+            else
+            {
+                prod.Coordinate = productModel.Coordinate;
+            }
+           
+
+
+            db.Entry(prod).State = EntityState.Modified;
 
             try
             {

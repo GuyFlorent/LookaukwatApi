@@ -86,10 +86,31 @@ namespace LookaukwatApi.Controllers
             return Ok(job);
         }
 
+        [Route("api/JobModels/GetJobCritere")]
+        [ResponseType(typeof(JobViewModel))]
+        public async Task<IHttpActionResult> GetJobCritere(int id)
+        {
+            JobModel jobModel = await db.Jobs.FindAsync(id);
+            if (jobModel == null)
+            {
+                return NotFound();
+            }
+
+            JobViewModel job = new JobViewModel
+            {
+                id = jobModel.id,
+                ActivitySector = jobModel.ActivitySector,
+                TypeContract = jobModel.TypeContract,
+                SearchOrAskJob = jobModel.SearchOrAskJob,
+                Price = jobModel.Price
+            };
+            return Ok(job);
+        }
+
         // PUT: api/JobModels/5
         [ResponseType(typeof(void))]
-            [Authorize]
-        public async Task<IHttpActionResult> PutJobModel(int id, JobModel jobModel)
+         
+        public async Task<IHttpActionResult> PutJobModel(int id, JobCritereViewModel jobModel)
         {
             if (!ModelState.IsValid)
             {
@@ -101,7 +122,15 @@ namespace LookaukwatApi.Controllers
                 return BadRequest();
             }
 
-            db.Entry(jobModel).State = EntityState.Modified;
+            var job = await db.Jobs.FirstOrDefaultAsync(m => m.id == id);
+
+
+            job.SearchOrAskJob = jobModel.SearchOrAskJob;
+            job.ActivitySector = jobModel.ActivitySector;
+            job.TypeContract = jobModel.TypeContract;
+            job.Price = jobModel.Price;
+
+            db.Entry(job).State = EntityState.Modified;
 
             try
             {

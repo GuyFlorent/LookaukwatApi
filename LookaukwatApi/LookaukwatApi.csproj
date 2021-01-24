@@ -274,17 +274,24 @@
     <Compile Include="Services\ImageService.cs" />
     <Compile Include="Services\SendGridService.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModel\ApartCritereViewModel.cs" />
     <Compile Include="ViewModel\ApartViewModel.cs" />
     <Compile Include="ViewModel\contactUserViewModel.cs" />
+    <Compile Include="ViewModel\HouseCritereViewModel.cs" />
     <Compile Include="ViewModel\HouseViewModel.cs" />
     <Compile Include="ViewModel\ImageModeView.cs" />
+    <Compile Include="ViewModel\JobCritereViewModel.cs" />
     <Compile Include="ViewModel\JobViewModel.cs" />
+    <Compile Include="ViewModel\ModeCritereViewModel.cs" />
     <Compile Include="ViewModel\ModeViewModel.cs" />
+    <Compile Include="ViewModel\MultimediaCritereViewModel.cs" />
     <Compile Include="ViewModel\MultimediaViewModel.cs" />
     <Compile Include="ViewModel\ProductForMobile.cs" />
+    <Compile Include="ViewModel\ProductViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\SimilarProductViewModel.cs" />
     <Compile Include="ViewModel\UserPhoneViewModel.cs" />
+    <Compile Include="ViewModel\VehiculeCritereViewModel.cs" />
     <Compile Include="ViewModel\VehiculeViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
