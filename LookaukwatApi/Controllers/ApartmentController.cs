@@ -38,9 +38,8 @@ namespace LookaukwatApi.Controllers
             apartmentRentalModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.ApartmentRentals.Where(m => m.Category.CategoryName == apartmentRentalModel.Category.CategoryName &&
-            m.Town == apartmentRentalModel.Town && m.SearchOrAskJob == apartmentRentalModel.SearchOrAskJob &&
-            m.SearchOrAskJob == apartmentRentalModel.SearchOrAskJob && m.id != apartmentRentalModel.id).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.ApartmentRentals.Where(m =>
+            m.Town == apartmentRentalModel.Town && m.SearchOrAskJob == apartmentRentalModel.SearchOrAskJob && m.id != apartmentRentalModel.id).OrderBy(o => Guid.NewGuid()).
             Take(6).Select(s => new SimilarProductViewModel
             {
                 id = s.id,
@@ -54,12 +53,12 @@ namespace LookaukwatApi.Controllers
             }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
-
-            foreach (var item in ListeSimilar)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+            Liste = ListeSimilar;
+            //foreach (var item in ListeSimilar)
+            //{
+            //    item.Date = ConvertDate.Convert(item.DateAdd);
+            //    Liste.Add(item);
+            //}
 
             ApartViewModel apart = new ApartViewModel
             {
@@ -136,7 +135,7 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeAppart) && typeAppart != "Tout")
             {
-                results = results.Where(m => m.TypeAppart == typeAppart).ToList();
+                results = results.Where(m => m.TypeAppart != null && m.TypeAppart == typeAppart).ToList();
             }
 
             if (price >= 0 && price < 1000000)
@@ -146,7 +145,7 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(furnitureOrNotAppart) && typeAppart !="Terrain à vendre" && furnitureOrNotAppart != "Tout")
             {
-                results = results.Where(m => m.FurnitureOrNotAppart == furnitureOrNotAppart).ToList();
+                results = results.Where(m => m.FurnitureOrNotAppart != null && m.FurnitureOrNotAppart == furnitureOrNotAppart).ToList();
 
                 if (roomNumberAppart >= 0)
                 {
@@ -166,9 +165,6 @@ namespace LookaukwatApi.Controllers
             }
 
             
-
-           
-
             return results.Count;
         }
 
@@ -291,7 +287,7 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeAppart) && typeAppart != "Tout")
             {
-                results = results.Where(m => m.TypeAppart == typeAppart).ToList();
+                results = results.Where(m => m.TypeAppart != null && m.TypeAppart == typeAppart).ToList();
             }
 
             if (price >= 0)
@@ -301,7 +297,7 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(furnitureOrNotAppart) && typeAppart != "Terrain à vendre" && furnitureOrNotAppart != "Tout")
             {
-                results = results.Where(m => m.FurnitureOrNotAppart == furnitureOrNotAppart).ToList();
+                results = results.Where(m => m.FurnitureOrNotAppart != null && m.FurnitureOrNotAppart == furnitureOrNotAppart).ToList();
 
                 if (roomNumberAppart >= 0)
                 {
@@ -322,9 +318,10 @@ namespace LookaukwatApi.Controllers
 
 
 
-           
+            List<SearchViewModel> Liste = new List<SearchViewModel>();
 
-            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            Liste = results.ToList();
+            var List = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -333,19 +330,11 @@ namespace LookaukwatApi.Controllers
                 Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
                 id = s.id,
                 Price = s.Price,
+                Date = s.Date,
                 ViewNumber = s.ViewNumber
             }).ToList();
 
-            List<ProductForMobile> Liste = new List<ProductForMobile>();
-
-            foreach (var item in List)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
-
-
-            return Liste;
+            return List;
         }
 
 

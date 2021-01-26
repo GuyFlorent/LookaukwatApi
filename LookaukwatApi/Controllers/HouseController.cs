@@ -38,9 +38,8 @@ namespace LookaukwatApi.Controllers
             houseModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Houses.Where(m => m.Category.CategoryName == houseModel.Category.CategoryName &&
-           m.Town == houseModel.Town && m.SearchOrAskJob == houseModel.SearchOrAskJob &&
-           m.SearchOrAskJob == houseModel.SearchOrAskJob && m.id != houseModel.id && m.RubriqueHouse == houseModel.RubriqueHouse).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.Houses.Where(m => 
+           m.Town == houseModel.Town && m.SearchOrAskJob == houseModel.SearchOrAskJob && m.id != houseModel.id && m.RubriqueHouse == houseModel.RubriqueHouse).OrderBy(o => Guid.NewGuid()).
            Take(6).Select(s => new SimilarProductViewModel
            {
                id = s.id,
@@ -54,12 +53,12 @@ namespace LookaukwatApi.Controllers
            }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
-
-            foreach (var item in ListeSimilar)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+            Liste = ListeSimilar;
+            //foreach (var item in ListeSimilar)
+            //{
+            //    item.Date = ConvertDate.Convert(item.DateAdd);
+            //    Liste.Add(item);
+            //}
 
 
             HouseViewModel house = new HouseViewModel
@@ -155,27 +154,27 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeHouse) && typeHouse != "Tout")
             {
-                results = results.Where(m => m.TypeHouse == typeHouse).ToList();
+                results = results.Where(m => m.TypeHouse != null && m.TypeHouse == typeHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(rubriqueHouse) && rubriqueHouse != "Toutes")
             {
-                results = results.Where(m => m.RubriqueHouse == rubriqueHouse).ToList();
+                results = results.Where(m => m.RubriqueHouse != null && m.RubriqueHouse == rubriqueHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(colorHouse) && colorHouse != "Toutes")
             {
-                results = results.Where(m => m.ColorHouse == colorHouse).ToList();
+                results = results.Where(m => m.ColorHouse != null && m.ColorHouse == colorHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(fabricMaterialHouse) && fabricMaterialHouse != "Tout")
             {
-                results = results.Where(m => m.FabricMaterialHouse == fabricMaterialHouse).ToList();
+                results = results.Where(m => m.FabricMaterialHouse != null && m.FabricMaterialHouse == fabricMaterialHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(stateHouse) && stateHouse != "Tout")
             {
-                results = results.Where(m => m.StateHouse == stateHouse).ToList();
+                results = results.Where(m => m.StateHouse != null && m.StateHouse == stateHouse).ToList();
             }
 
 
@@ -316,30 +315,33 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeHouse) && typeHouse != "Tout")
             {
-                results = results.Where(m => m.TypeHouse == typeHouse).ToList();
+                results = results.Where(m => m.TypeHouse != null && m.TypeHouse == typeHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(rubriqueHouse) && rubriqueHouse != "Toutes")
             {
-                results = results.Where(m => m.RubriqueHouse == rubriqueHouse).ToList();
+                results = results.Where(m => m.RubriqueHouse != null && m.RubriqueHouse == rubriqueHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(colorHouse) && colorHouse != "Toutes")
             {
-                results = results.Where(m => m.ColorHouse == colorHouse).ToList();
+                results = results.Where(m => m.ColorHouse != null && m.ColorHouse == colorHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(fabricMaterialHouse) && fabricMaterialHouse != "Tout")
             {
-                results = results.Where(m => m.FabricMaterialHouse == fabricMaterialHouse).ToList();
+                results = results.Where(m => m.FabricMaterialHouse != null && m.FabricMaterialHouse == fabricMaterialHouse).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(stateHouse) && stateHouse != "Tout")
             {
-                results = results.Where(m => m.StateHouse == stateHouse).ToList();
+                results = results.Where(m => m.StateHouse != null && m.StateHouse == stateHouse).ToList();
             }
 
-            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            List<SearchViewModel> Liste = new List<SearchViewModel>();
+
+            Liste = results.ToList();
+            var List = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -348,19 +350,12 @@ namespace LookaukwatApi.Controllers
                 Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
                 id = s.id,
                 Price = s.Price,
+                Date = s.Date,
                 ViewNumber = s.ViewNumber
             }).ToList();
 
-            List<ProductForMobile> Liste = new List<ProductForMobile>();
 
-            foreach (var item in List)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
-
-
-            return Liste;
+            return List;
         }
 
         // PUT: api/House/5

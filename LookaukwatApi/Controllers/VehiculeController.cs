@@ -38,9 +38,8 @@ namespace LookaukwatApi.Controllers
             vehiculeModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Vehicules.Where(m => m.Category.CategoryName == vehiculeModel.Category.CategoryName &&
-          m.Town == vehiculeModel.Town && m.SearchOrAskJob == vehiculeModel.SearchOrAskJob &&
-          m.SearchOrAskJob == vehiculeModel.SearchOrAskJob && m.id != vehiculeModel.id && m.RubriqueVehicule == vehiculeModel.RubriqueVehicule).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.Vehicules.Where(m => 
+          m.Town == vehiculeModel.Town && m.SearchOrAskJob == vehiculeModel.SearchOrAskJob && m.id != vehiculeModel.id && m.RubriqueVehicule == vehiculeModel.RubriqueVehicule).OrderBy(o => Guid.NewGuid()).
           Take(6).Select(s => new SimilarProductViewModel
           {
               id = s.id,
@@ -54,12 +53,12 @@ namespace LookaukwatApi.Controllers
           }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
-
-            foreach (var item in ListeSimilar)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+            Liste = ListeSimilar;
+            //foreach (var item in ListeSimilar)
+            //{
+            //    item.Date = ConvertDate.Convert(item.DateAdd);
+            //    Liste.Add(item);
+            //}
 
             VehiculeViewModel vehicule = new VehiculeViewModel
             {
@@ -174,51 +173,51 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(year))
             {
-                results = results.Where(m => Convert.ToInt32( m.Year) <= Convert.ToInt32(year)).ToList();
+                results = results.Where(m => m.Year != null && Convert.ToInt32( m.Year) <= Convert.ToInt32(year)).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(mileage) && Convert.ToInt32(mileage) <300000)
             {
-                results = results.Where(m => Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
+                results = results.Where(m => m.Mileage != null && Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeBrand) && vehiculeBrand != "Toutes")
             {
-                results = results.Where(m => m.VehiculeBrand == vehiculeBrand).ToList();
+                results = results.Where(m => m.VehiculeBrand != null && m.VehiculeBrand == vehiculeBrand).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeModel) && vehiculeModel != "Tout")
             {
-                results = results.Where(m => m.VehiculeModel == vehiculeModel).ToList();
+                results = results.Where(m => m.VehiculeModel != null && m.VehiculeModel == vehiculeModel).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeType) && vehiculeType != "Tout")
             {
-                results = results.Where(m => m.VehiculeType == vehiculeType).ToList();
+                results = results.Where(m => m.VehiculeType != null && m.VehiculeType == vehiculeType).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(petrol) && petrol != "Tout")
             {
-                results = results.Where(m => m.Petrol == petrol).ToList();
+                results = results.Where(m => m.Petrol != null && m.Petrol == petrol).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(numberOfDoor) && numberOfDoor != "Toutes")
             {
-                results = results.Where(m => m.NumberOfDoor == numberOfDoor).ToList();
+                results = results.Where(m => m.NumberOfDoor != null && m.NumberOfDoor == numberOfDoor).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(gearBox) && gearBox != "Toutes")
             {
-                results = results.Where(m => m.GearBox == gearBox).ToList();
+                results = results.Where(m => m.GearBox != null && m.GearBox == gearBox).ToList();
             }
             if (!string.IsNullOrWhiteSpace(color) && color != "Toutes")
             {
-                results = results.Where(m => m.Color == color).ToList();
+                results = results.Where(m => m.Color != null && m.Color == color).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculestate) && vehiculestate != "Tout")
             {
-                results = results.Where(m => m.Vehiculestate == vehiculestate).ToList();
+                results = results.Where(m => m.Vehiculestate != null && m.Vehiculestate == vehiculestate).ToList();
             }
 
 
@@ -373,71 +372,77 @@ namespace LookaukwatApi.Controllers
                     break;
             }
 
-             
 
-            if (!string.IsNullOrWhiteSpace(vehiculeRubrique) && vehiculeRubrique != "Toutes")
-            {
-                results = results.Where(m => m.VehiculeRubrique == vehiculeRubrique).ToList();
-            }
-            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
-            {
-                results = results.Where(m => m.Town == town).ToList();
-            }
+
             if (price >= 0 && price < 2000000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(year))
+
+            if (!string.IsNullOrWhiteSpace(vehiculeRubrique) && vehiculeRubrique != "Toutes")
             {
-                results = results.Where(m => Convert.ToInt32(m.Year) <= Convert.ToInt32(year)).ToList();
+                results = results.Where(m => m.VehiculeRubrique == vehiculeRubrique).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(mileage))
+            if (!string.IsNullOrWhiteSpace(town) && town != "Toutes")
             {
-                results = results.Where(m => Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
+                results = results.Where(m => m.Town == town).ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(year))
+            {
+                results = results.Where(m => m.Year != null && Convert.ToInt32(m.Year) <= Convert.ToInt32(year)).ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(mileage) && Convert.ToInt32(mileage) < 300000)
+            {
+                results = results.Where(m => m.Mileage != null && Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeBrand) && vehiculeBrand != "Toutes")
             {
-                results = results.Where(m => m.VehiculeBrand == vehiculeBrand).ToList();
+                results = results.Where(m => m.VehiculeBrand != null && m.VehiculeBrand == vehiculeBrand).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeModel) && vehiculeModel != "Tout")
             {
-                results = results.Where(m => m.VehiculeModel == vehiculeModel).ToList();
+                results = results.Where(m => m.VehiculeModel != null && m.VehiculeModel == vehiculeModel).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeType) && vehiculeType != "Tout")
             {
-                results = results.Where(m => m.VehiculeType == vehiculeType).ToList();
+                results = results.Where(m => m.VehiculeType != null && m.VehiculeType == vehiculeType).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(petrol) && petrol != "Tout")
             {
-                results = results.Where(m => m.Petrol == petrol).ToList();
+                results = results.Where(m => m.Petrol != null && m.Petrol == petrol).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(numberOfDoor) && numberOfDoor != "Toutes")
             {
-                results = results.Where(m => m.NumberOfDoor == numberOfDoor).ToList();
+                results = results.Where(m => m.NumberOfDoor != null && m.NumberOfDoor == numberOfDoor).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(gearBox) && gearBox != "Toutes")
             {
-                results = results.Where(m => m.GearBox == gearBox).ToList();
+                results = results.Where(m => m.GearBox != null && m.GearBox == gearBox).ToList();
             }
             if (!string.IsNullOrWhiteSpace(color) && color != "Toutes")
             {
-                results = results.Where(m => m.Color == color).ToList();
+                results = results.Where(m => m.Color != null && m.Color == color).ToList();
             }
+
             if (!string.IsNullOrWhiteSpace(vehiculestate) && vehiculestate != "Tout")
             {
-                results = results.Where(m => m.Vehiculestate == vehiculestate).ToList();
+                results = results.Where(m => m.Vehiculestate != null && m.Vehiculestate == vehiculestate).ToList();
             }
 
+            List<SearchViewModel> Liste = new List<SearchViewModel>();
 
-            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            Liste = results.ToList();
+            var List = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -446,19 +451,20 @@ namespace LookaukwatApi.Controllers
                 Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
                 id = s.id,
                 Price = s.Price,
+                Date = s.Date,
                 ViewNumber = s.ViewNumber
             }).ToList();
 
-            List<ProductForMobile> Liste = new List<ProductForMobile>();
+            //List<ProductForMobile> Liste = new List<ProductForMobile>();
 
-            foreach (var item in List)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+            //foreach (var item in List)
+            //{
+            //    item.Date = ConvertDate.Convert(item.DateAdd);
+            //    Liste.Add(item);
+            //}
 
 
-            return Liste;
+            return List;
         }
 
         // PUT: api/Vehicule/5

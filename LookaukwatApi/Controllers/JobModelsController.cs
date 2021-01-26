@@ -39,7 +39,7 @@ namespace LookaukwatApi.Controllers
             jobModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Jobs.Where(m => m.Category.CategoryName == jobModel.Category.CategoryName &&
+            var ListeSimilar = db.Jobs.Where(m => 
             m.Town == jobModel.Town && m.SearchOrAskJob == jobModel.SearchOrAskJob && m.id != jobModel.id).OrderBy(o => Guid.NewGuid()).
             Take(6).Select(s => new SimilarProductViewModel
             {
@@ -54,12 +54,12 @@ namespace LookaukwatApi.Controllers
             }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
-
-            foreach (var item in ListeSimilar)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+            Liste = ListeSimilar;
+            //foreach (var item in ListeSimilar)
+            //{
+            //    item.Date = ConvertDate.Convert(item.DateAdd);
+            //    Liste.Add(item);
+            //}
 
 
             JobViewModel job = new JobViewModel 
@@ -180,12 +180,12 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeContract) && typeContract != "Tout")
             {
-                results = results.Where(m => m.TypeContract == typeContract).ToList();
+                results = results.Where(m => m.TypeContract != null && m.TypeContract == typeContract).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(activitySector) && activitySector != "Tout")
             {
-                results = results.Where(m => m.ActivitySector == activitySector).ToList();
+                results = results.Where(m => m.ActivitySector != null && m.ActivitySector == activitySector).ToList();
             }
 
 
@@ -307,16 +307,19 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeContract) && typeContract != "Tout")
             {
-                results = results.Where(m => m.TypeContract == typeContract).ToList();
+                results = results.Where(m => m.TypeContract != null && m.TypeContract == typeContract).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(activitySector) && activitySector != "Tout")
             {
-                results = results.Where(m => m.ActivitySector == activitySector).ToList();
+                results = results.Where(m => m.ActivitySector != null && m.ActivitySector == activitySector).ToList();
             }
 
 
-            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            List<SearchViewModel> Liste = new List<SearchViewModel>();
+
+            Liste = results.ToList();
+            var List = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -325,19 +328,12 @@ namespace LookaukwatApi.Controllers
                 Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
                 id = s.id,
                 Price = s.Price,
+                Date = s.Date,
                 ViewNumber = s.ViewNumber
             }).ToList();
 
-            List<ProductForMobile> Liste = new List<ProductForMobile>();
 
-            foreach (var item in List)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
-
-
-            return Liste;
+            return List;
         }
 
 

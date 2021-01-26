@@ -1,4 +1,5 @@
 ﻿using LookaukwatApi.Models;
+using LookaukwatApi.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace LookaukwatApi.ViewModel
     {
         public int id { get; set; }
         public int ViewNumber { get; set; }
+        public string Date { get => ConvertDate.Convert(DateAdd); }
         //For all product
         public string Title { get; set; }
         public DateTime DateAdd { get; set; }

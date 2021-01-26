@@ -609,10 +609,10 @@ namespace LookaukwatApi.Models
         //    return true;
         //}
 
-        //public List<ParrainModel> GetParrainList()
-        //{
-        //    return dbb.Parrains.ToList();
-        //}
+        public List<ParrainModel> GetParrainList()
+        {
+            return dbb.Parrains.ToList();
+        }
 
         //public void AddParrain(ParrainModel model)
         //{

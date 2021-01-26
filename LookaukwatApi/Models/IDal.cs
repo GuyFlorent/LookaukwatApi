@@ -17,7 +17,7 @@ namespace LookaukwatApi.Models
         //void UpdateUserByAdmin(ApplicationUser user);
         //void DeleteUserByAdmin(ApplicationUser user);
         ////Parrain
-        //List<ParrainModel> GetParrainList();
+        List<ParrainModel> GetParrainList();
         //void AddParrain(ParrainModel model);
         //void DeletParrain(ParrainModel model);
         ////Product

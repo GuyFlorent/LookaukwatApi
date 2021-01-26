@@ -444,7 +444,23 @@ namespace LookaukwatApi.Controllers
             return Ok(prod);
         }
 
-        //For user checking
+        //For user checkingggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
+
+        [HttpGet]
+        [Route("api/Product/GetParrainList")]
+        public async Task<IDictionary<string, string>> GetParrainList()
+        {
+            IDictionary<string, string> list = new Dictionary<string, string>();
+            var ListParrain = await db.Parrains.ToListAsync();
+
+            foreach(var parrain in ListParrain)
+            {
+                list.Add(parrain.ParrainFirstName,parrain.ParrainEmail);
+            }
+            return list;
+        }
+
+
         [ResponseType(typeof(ApplicationUser))]
         [Authorize]
         [Route("api/Product/GetUserInformation")]

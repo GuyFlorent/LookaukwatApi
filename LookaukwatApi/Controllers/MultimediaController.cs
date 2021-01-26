@@ -38,9 +38,8 @@ namespace LookaukwatApi.Controllers
             multimediaModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Multimedia.Where(m => m.Category.CategoryName == multimediaModel.Category.CategoryName &&
-           m.Town == multimediaModel.Town && m.SearchOrAskJob == multimediaModel.SearchOrAskJob &&
-           m.SearchOrAskJob == multimediaModel.SearchOrAskJob && m.id != multimediaModel.id && m.Type == multimediaModel.Type).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.Multimedia.Where(m =>
+           m.Town == multimediaModel.Town && m.SearchOrAskJob == multimediaModel.SearchOrAskJob && m.id != multimediaModel.id && m.Type == multimediaModel.Type).OrderBy(o => Guid.NewGuid()).
            Take(6).Select(s => new SimilarProductViewModel
            {
                id = s.id,
@@ -54,12 +53,12 @@ namespace LookaukwatApi.Controllers
            }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
-
-            foreach (var item in ListeSimilar)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+            Liste = ListeSimilar;
+            //foreach (var item in ListeSimilar)
+            //{
+            //    item.Date = ConvertDate.Convert(item.DateAdd);
+            //    Liste.Add(item);
+            //}
 
 
             MultimediaViewModel multimedia = new MultimediaViewModel
@@ -146,22 +145,22 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(multimediaBrand) && multimediaBrand != "Toutes")
             {
-                results = results.Where(m => m.MultimediaBrand == multimediaBrand).ToList();
+                results = results.Where(m => m.MultimediaBrand != null && m.MultimediaBrand == multimediaBrand).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(multimediaModel) && multimediaModel != "Tout")
             {
-                results = results.Where(m => m.MultimediaModel == multimediaModel).ToList();
+                results = results.Where(m => m.MultimediaModel != null && m.MultimediaModel == multimediaModel).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(multimediaRubrique) && multimediaRubrique != "Toutes")
             {
-                results = results.Where(m => m.MultimediaRubrique == multimediaRubrique).ToList();
+                results = results.Where(m => m.MultimediaRubrique != null && m.MultimediaRubrique == multimediaRubrique).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(multimediaCapacity) && multimediaCapacity != "Toutes")
             {
-                results = results.Where(m => m.MultimediaCapacity == multimediaCapacity).ToList();
+                results = results.Where(m => m.MultimediaCapacity != null && m.MultimediaCapacity == multimediaCapacity).ToList();
             }
 
             return results.Count;
@@ -293,22 +292,22 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(multimediaBrand) && multimediaBrand != "Toutes")
             {
-                results = results.Where(m => m.MultimediaBrand == multimediaBrand).ToList();
+                results = results.Where(m => m.MultimediaBrand != null && m.MultimediaBrand == multimediaBrand).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(multimediaModel) && multimediaModel != "Tout")
             {
-                results = results.Where(m => m.MultimediaModel == multimediaModel).ToList();
+                results = results.Where(m => m.MultimediaModel != null && m.MultimediaModel == multimediaModel).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(multimediaRubrique) && multimediaRubrique != "Toutes")
             {
-                results = results.Where(m => m.MultimediaRubrique == multimediaRubrique).ToList();
+                results = results.Where(m => m.MultimediaRubrique != null && m.MultimediaRubrique == multimediaRubrique).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(multimediaCapacity) && multimediaCapacity != "Toutes")
             {
-                results = results.Where(m => m.MultimediaCapacity == multimediaCapacity).ToList();
+                results = results.Where(m => m.MultimediaCapacity != null && m.MultimediaCapacity == multimediaCapacity).ToList();
             }
 
             var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
@@ -323,16 +322,24 @@ namespace LookaukwatApi.Controllers
                 ViewNumber = s.ViewNumber
             }).ToList();
 
-            List<ProductForMobile> Liste = new List<ProductForMobile>();
+            List<SearchViewModel> Liste = new List<SearchViewModel>();
 
-            foreach (var item in List)
+            Liste = results.ToList();
+            var Lis = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+                Title = s.Title,
+                Town = s.Town,
+                DateAdd = s.DateAdd,
+                Category = s.Category,
+                Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
+                id = s.id,
+                Price = s.Price,
+                Date = s.Date,
+                ViewNumber = s.ViewNumber
+            }).ToList();
 
 
-            return Liste;
+            return Lis;
         }
 
         // PUT: api/Multimedia/5

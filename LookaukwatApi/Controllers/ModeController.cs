@@ -39,7 +39,7 @@ namespace LookaukwatApi.Controllers
             modeModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Modes.Where(m => m.Category.CategoryName == modeModel.Category.CategoryName &&
+            var ListeSimilar = db.Modes.Where(m => 
             m.Town == modeModel.Town && m.SearchOrAskJob == modeModel.SearchOrAskJob &&
             m.RubriqueMode == modeModel.RubriqueMode && m.id != modeModel.id && m.RubriqueMode == modeModel.RubriqueMode).OrderBy(o => Guid.NewGuid()).
             Take(6).Select(s => new SimilarProductViewModel
@@ -55,12 +55,12 @@ namespace LookaukwatApi.Controllers
             }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
-
-            foreach (var item in ListeSimilar)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
+            Liste = ListeSimilar;
+            //foreach (var item in ListeSimilar)
+            //{
+            //    item.Date = ConvertDate.Convert(item.DateAdd);
+            //    Liste.Add(item);
+            //}
 
 
             ModeViewModel mode = new ModeViewModel
@@ -162,31 +162,31 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeMode) && typeMode != "Tout")
             {
-                results = results.Where(m => m.TypeMode == typeMode).ToList();
+                results = results.Where(m => m.TypeMode!=null && m.TypeMode == typeMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(brandMode) && brandMode != "Toutes")
             {
-                results = results.Where(m => m.BrandMode == brandMode).ToList();
+                results = results.Where(m => m.BrandMode != null && m.BrandMode == brandMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(universMode) && universMode != "Tout")
             {
-                results = results.Where(m => m.UniversMode == universMode).ToList();
+                results = results.Where(m =>  m.UniversMode != null && m.UniversMode == universMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(sizeMode) && sizeMode != "Toutes")
             {
-                results = results.Where(m => m.SizeMode == sizeMode).ToList();
+                results = results.Where(m => m.SizeMode != null && m.SizeMode == sizeMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(state) && state != "Tout")
             {
-                results = results.Where(m => m.State == state).ToList();
+                results = results.Where(m => m.State != null && m.State == state).ToList();
             }
             if (!string.IsNullOrWhiteSpace(colorMode) && colorMode != "Toutes")
             {
-                results = results.Where(m => m.ColorMode == colorMode).ToList();
+                results = results.Where(m => m.ColorMode != null && m.ColorMode == colorMode).ToList();
             }
 
 
@@ -345,35 +345,38 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeMode) && typeMode != "Tout")
             {
-                results = results.Where(m => m.TypeMode == typeMode).ToList();
+                results = results.Where(m => m.TypeMode != null && m.TypeMode == typeMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(brandMode) && brandMode != "Toutes")
             {
-                results = results.Where(m => m.BrandMode == brandMode).ToList();
+                results = results.Where(m => m.BrandMode != null && m.BrandMode == brandMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(universMode) && universMode != "Tout")
             {
-                results = results.Where(m => m.UniversMode == universMode).ToList();
+                results = results.Where(m => m.UniversMode != null && m.UniversMode == universMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(sizeMode) && sizeMode != "Toutes")
             {
-                results = results.Where(m => m.SizeMode == sizeMode).ToList();
+                results = results.Where(m => m.SizeMode != null && m.SizeMode == sizeMode).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(state) && state != "Tout")
             {
-                results = results.Where(m => m.State == state).ToList();
+                results = results.Where(m => m.State != null && m.State == state).ToList();
             }
             if (!string.IsNullOrWhiteSpace(colorMode) && colorMode != "Toutes")
             {
-                results = results.Where(m => m.ColorMode == colorMode).ToList();
+                results = results.Where(m => m.Color != null && m.ColorMode == colorMode).ToList();
             }
 
 
-            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            List<SearchViewModel> Liste = new List<SearchViewModel>();
+
+            Liste = results.ToList();
+            var List = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -382,19 +385,11 @@ namespace LookaukwatApi.Controllers
                 Image = s.Images.Select(im => im.ImageMobile).FirstOrDefault(),
                 id = s.id,
                 Price = s.Price,
+                Date = s.Date,
                 ViewNumber = s.ViewNumber
             }).ToList();
 
-            List<ProductForMobile> Liste = new List<ProductForMobile>();
-
-            foreach (var item in List)
-            {
-                item.Date = ConvertDate.Convert(item.DateAdd);
-                Liste.Add(item);
-            }
-
-
-            return Liste;
+            return List;
         }
 
         // PUT: api/Mode/5

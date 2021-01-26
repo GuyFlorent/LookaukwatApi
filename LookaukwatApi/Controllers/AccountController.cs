@@ -16,6 +16,7 @@ using Microsoft.Owin.Security.OAuth;
 using LookaukwatApi.Models;
 using LookaukwatApi.Providers;
 using LookaukwatApi.Results;
+using System.Linq;
 
 namespace LookaukwatApi.Controllers
 {
@@ -333,7 +334,7 @@ namespace LookaukwatApi.Controllers
             if (!string.IsNullOrWhiteSpace(model.ParrainName))
             {
                 IDal dal = new Dal();
-                //parrain = dal.GetParrainList().FirstOrDefault(m => m.ParrainEmail == model.ParrainName);
+                parrain = dal.GetParrainList().FirstOrDefault(m => m.ParrainEmail == model.ParrainName);
                 user = new ApplicationUser { UserName = model.Email.ToLower(), Email = model.Email.ToLower(), PhoneNumber = model.Phone, FirstName = model.FirstName, Parrain_Id = parrain.Id, Date_Create_Account = DateTime.Now };
             }
             else
