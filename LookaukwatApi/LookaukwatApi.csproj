@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" />
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -47,10 +46,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SendGrid, Version=9.22.0.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
@@ -214,6 +213,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ApartmentController.cs" />
+    <Compile Include="Controllers\CommandController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\HouseController.cs" />
     <Compile Include="Controllers\JobModelsController.cs" />
@@ -249,12 +249,50 @@
     <Compile Include="Migrations\202012261123152_MiseAJour.Designer.cs">
       <DependentUpon>202012261123152_MiseAJour.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202102201027264_newModel.cs" />
+    <Compile Include="Migrations\202102201027264_newModel.Designer.cs">
+      <DependentUpon>202102201027264_newModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202102201127286_DATENull.cs" />
+    <Compile Include="Migrations\202102201127286_DATENull.Designer.cs">
+      <DependentUpon>202102201127286_DATENull.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202102201247466_isdeletebyuser.cs" />
+    <Compile Include="Migrations\202102201247466_isdeletebyuser.Designer.cs">
+      <DependentUpon>202102201247466_isdeletebyuser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202102221418036_trackingModel.cs" />
+    <Compile Include="Migrations\202102221418036_trackingModel.Designer.cs">
+      <DependentUpon>202102221418036_trackingModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202102241243340_updateProduct.cs" />
+    <Compile Include="Migrations\202102241243340_updateProduct.Designer.cs">
+      <DependentUpon>202102241243340_updateProduct.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202102241407100_addIsLOOkaukwat.cs" />
+    <Compile Include="Migrations\202102241407100_addIsLOOkaukwat.Designer.cs">
+      <DependentUpon>202102241407100_addIsLOOkaukwat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202102242002334_ChangeStock.cs" />
+    <Compile Include="Migrations\202102242002334_ChangeStock.Designer.cs">
+      <DependentUpon>202102242002334_ChangeStock.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202102251158375_ChangeStock2.cs" />
+    <Compile Include="Migrations\202102251158375_ChangeStock2.Designer.cs">
+      <DependentUpon>202102251158375_ChangeStock2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202103010823255_OtherNumberCount.cs" />
+    <Compile Include="Migrations\202103010823255_OtherNumberCount.Designer.cs">
+      <DependentUpon>202103010823255_OtherNumberCount.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApartmentRentalModel.cs" />
     <Compile Include="Models\CategoryModel.cs" />
+    <Compile Include="Models\CommandModel.cs" />
     <Compile Include="Models\Dal.cs" />
+    <Compile Include="Models\DeliveredAdressModel.cs" />
     <Compile Include="Models\HouseModel.cs" />
     <Compile Include="Models\IDal.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -265,6 +303,8 @@
     <Compile Include="Models\ParrainModel.cs" />
     <Compile Include="Models\ProductCoordinateModel.cs" />
     <Compile Include="Models\ProductModel.cs" />
+    <Compile Include="Models\PurchaseModel.cs" />
+    <Compile Include="Models\TrackingCommandModel.cs" />
     <Compile Include="Models\VehiculeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
@@ -278,6 +318,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModel\ApartCritereViewModel.cs" />
     <Compile Include="ViewModel\ApartViewModel.cs" />
+    <Compile Include="ViewModel\CommandForMobile.cs" />
     <Compile Include="ViewModel\contactUserViewModel.cs" />
     <Compile Include="ViewModel\HouseCritereViewModel.cs" />
     <Compile Include="ViewModel\HouseViewModel.cs" />
@@ -288,10 +329,12 @@
     <Compile Include="ViewModel\ModeViewModel.cs" />
     <Compile Include="ViewModel\MultimediaCritereViewModel.cs" />
     <Compile Include="ViewModel\MultimediaViewModel.cs" />
+    <Compile Include="ViewModel\MyRoleConstant.cs" />
     <Compile Include="ViewModel\ProductForMobile.cs" />
     <Compile Include="ViewModel\ProductViewModel.cs" />
     <Compile Include="ViewModel\SearchViewModel.cs" />
     <Compile Include="ViewModel\SimilarProductViewModel.cs" />
+    <Compile Include="ViewModel\TrackingCommandViewModel.cs" />
     <Compile Include="ViewModel\UserPhoneViewModel.cs" />
     <Compile Include="ViewModel\VehiculeCritereViewModel.cs" />
     <Compile Include="ViewModel\VehiculeViewModel.cs" />
@@ -339,6 +382,9 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="UserImage\adama_sanogo.jpg" />
+    <Content Include="UserImage\Alain.jpg" />
+    <Content Include="UserImage\guy.jpg" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -356,7 +402,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="UserImage\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -406,6 +451,33 @@
     <EmbeddedResource Include="Migrations\202012261123152_MiseAJour.resx">
       <DependentUpon>202012261123152_MiseAJour.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102201027264_newModel.resx">
+      <DependentUpon>202102201027264_newModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102201127286_DATENull.resx">
+      <DependentUpon>202102201127286_DATENull.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102201247466_isdeletebyuser.resx">
+      <DependentUpon>202102201247466_isdeletebyuser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102221418036_trackingModel.resx">
+      <DependentUpon>202102221418036_trackingModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102241243340_updateProduct.resx">
+      <DependentUpon>202102241243340_updateProduct.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102241407100_addIsLOOkaukwat.resx">
+      <DependentUpon>202102241407100_addIsLOOkaukwat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102242002334_ChangeStock.resx">
+      <DependentUpon>202102242002334_ChangeStock.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202102251158375_ChangeStock2.resx">
+      <DependentUpon>202102251158375_ChangeStock2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202103010823255_OtherNumberCount.resx">
+      <DependentUpon>202103010823255_OtherNumberCount.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -440,10 +512,7 @@
       <ErrorText>Ce projet fait référence à des packages NuGet qui sont manquants sur cet ordinateur. Utilisez l'option de restauration des packages NuGet pour les télécharger. Pour plus d'informations, consultez http://go.microsoft.com/fwlink/?LinkID=322105. Le fichier manquant est : {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.0\build\EntityFramework.targets'))" />
   </Target>
-  <Import Project="..\packages\EntityFramework.6.4.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.0\build\EntityFramework.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

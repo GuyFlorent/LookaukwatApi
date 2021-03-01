@@ -12,6 +12,7 @@ namespace LookaukwatApi.ViewModel
     {
 
         public int id { get; set; }
+        public int NumberImages { get; set; }
         [DisplayName("Je vends/Je recherche")]
         public string SearchOrAsk { get; set; }
         [DisplayName("Ville")]
@@ -55,5 +56,7 @@ namespace LookaukwatApi.ViewModel
         public string UserEmail { get; set; }
         public List<string> Images { get; set; }
         public List<SimilarProductViewModel> SimilarProduct { get; set; }
+        public bool IsLookaukwat { get; set; }
+        public int Stock { get; set; }
     }
 }

@@ -21,5 +21,6 @@ namespace LookaukwatApi.ViewModel
         public int Price { get; set; }
 
         public virtual ProductCoordinateModel Coordinate { get; set; }
+        public bool IsLookaukwat { get; set; }
     }
 }

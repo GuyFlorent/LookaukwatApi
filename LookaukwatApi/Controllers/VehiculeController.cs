@@ -38,8 +38,8 @@ namespace LookaukwatApi.Controllers
             vehiculeModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Vehicules.Where(m => 
-          m.Town == vehiculeModel.Town && m.SearchOrAskJob == vehiculeModel.SearchOrAskJob && m.id != vehiculeModel.id && m.RubriqueVehicule == vehiculeModel.RubriqueVehicule).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.Vehicules.Where(m => m.Town == vehiculeModel.Town && m.SearchOrAskJob == vehiculeModel.SearchOrAskJob
+            && m.id != vehiculeModel.id && m.RubriqueVehicule == vehiculeModel.RubriqueVehicule).OrderBy(o => Guid.NewGuid()).
           Take(6).Select(s => new SimilarProductViewModel
           {
               id = s.id,
@@ -49,7 +49,8 @@ namespace LookaukwatApi.Controllers
               Town = s.Town,
               DateAdd = s.DateAdd,
               Image = s.Images.Select(m => m.ImageMobile).FirstOrDefault(),
-
+              NumberImages = s.Images.Count,
+              IsLookaukwat = s.IsLookaukwat
           }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
@@ -91,6 +92,8 @@ namespace LookaukwatApi.Controllers
                 ViewNumber = vehiculeModel.ViewNumber,
                 Lat = vehiculeModel.Coordinate.Lat,
                 Lon = vehiculeModel.Coordinate.Lon,
+                IsLookaukwat = vehiculeModel.IsLookaukwat,
+                Stock = vehiculeModel.Stock
             };
 
             return Ok(vehicule);
@@ -131,10 +134,10 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Vehicule
         [Route("api/Vehicule/GetOfferVehiculeSearchNumber")]
-        public async Task<int> GetOfferVehiculeSearchNumber(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color)
+        public async Task<int> GetOfferVehiculeSearchNumber(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color, bool isParticulier, bool isLookaukwat)
         {
 
-            var results = await db.Vehicules.
+            var results = await db.Vehicules.Where(m => m.IsActive && m.Category.CategoryName == categori && m.SearchOrAskJob == searchOrAskJob).
               Select(s => new SearchViewModel
               {
                   Category = s.Category.CategoryName,
@@ -151,9 +154,24 @@ namespace LookaukwatApi.Controllers
                   GearBox = s.GearBoxVehicule,
                   Color = s.ColorVehicule,
                   Vehiculestate = s.StateVehicule,
-                  VehiculeRubrique = s.RubriqueVehicule
+                  VehiculeRubrique = s.RubriqueVehicule,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).ToListAsync();
+
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 2000000)
             {
@@ -173,12 +191,12 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(year))
             {
-                results = results.Where(m => m.Year != null && Convert.ToInt32( m.Year) <= Convert.ToInt32(year)).ToList();
+                results = results.Where(m =>  Convert.ToInt32( m.Year) <= Convert.ToInt32(year)).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(mileage) && Convert.ToInt32(mileage) <300000)
             {
-                results = results.Where(m => m.Mileage != null && Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
+                results = results.Where(m =>  Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeBrand) && vehiculeBrand != "Toutes")
@@ -193,31 +211,31 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(vehiculeType) && vehiculeType != "Tout")
             {
-                results = results.Where(m => m.VehiculeType != null && m.VehiculeType == vehiculeType).ToList();
+                results = results.Where(m => m.VehiculeType == vehiculeType).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(petrol) && petrol != "Tout")
             {
-                results = results.Where(m => m.Petrol != null && m.Petrol == petrol).ToList();
+                results = results.Where(m => m.Petrol == petrol).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(numberOfDoor) && numberOfDoor != "Toutes")
             {
-                results = results.Where(m => m.NumberOfDoor != null && m.NumberOfDoor == numberOfDoor).ToList();
+                results = results.Where(m => m.NumberOfDoor == numberOfDoor).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(gearBox) && gearBox != "Toutes")
             {
-                results = results.Where(m => m.GearBox != null && m.GearBox == gearBox).ToList();
+                results = results.Where(m =>  m.GearBox == gearBox).ToList();
             }
             if (!string.IsNullOrWhiteSpace(color) && color != "Toutes")
             {
-                results = results.Where(m => m.Color != null && m.Color == color).ToList();
+                results = results.Where(m => m.Color!=null && m.Color == color).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculestate) && vehiculestate != "Tout")
             {
-                results = results.Where(m => m.Vehiculestate != null && m.Vehiculestate == vehiculestate).ToList();
+                results = results.Where(m => m.Vehiculestate!=null  && m.Vehiculestate == vehiculestate).ToList();
             }
 
 
@@ -227,7 +245,7 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Vehicule
         [Route("api/Vehicule/GetOfferVehiculeSearch")]
-        public async Task<List<ProductForMobile>> GetOfferVehiculeSearch(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color, int pageIndex, int pageSize, string sortBy)
+        public async Task<List<ProductForMobile>> GetOfferVehiculeSearch(string categori, string town, string searchOrAskJob, int price, string vehiculeRubrique, string vehiculeBrand, string vehiculeModel, string vehiculeType, string petrol, string year, string mileage, string numberOfDoor, string gearBox, string vehiculestate, string color, int pageIndex, int pageSize, string sortBy, bool isParticulier, bool isLookaukwat)
         {
             List<SearchViewModel> results = new List<SearchViewModel>();
             switch (sortBy)
@@ -255,9 +273,12 @@ namespace LookaukwatApi.Controllers
                   GearBox = s.GearBoxVehicule,
                   Color = s.ColorVehicule,
                   Vehiculestate = s.StateVehicule,
-                  VehiculeRubrique = s.RubriqueVehicule
+                  VehiculeRubrique = s.RubriqueVehicule,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "MostOld":
                     results = await db.Vehicules.OrderBy(o => o.id).
@@ -282,9 +303,11 @@ namespace LookaukwatApi.Controllers
                   GearBox = s.GearBoxVehicule,
                   Color = s.ColorVehicule,
                   Vehiculestate = s.StateVehicule,
-                  VehiculeRubrique = s.RubriqueVehicule
-
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                  VehiculeRubrique = s.RubriqueVehicule,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "LowerPrice":
 
@@ -310,9 +333,11 @@ namespace LookaukwatApi.Controllers
                   GearBox = s.GearBoxVehicule,
                   Color = s.ColorVehicule,
                   Vehiculestate = s.StateVehicule,
-                  VehiculeRubrique = s.RubriqueVehicule
-
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                  VehiculeRubrique = s.RubriqueVehicule,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "HeigherPrice":
 
@@ -338,9 +363,11 @@ namespace LookaukwatApi.Controllers
                   GearBox = s.GearBoxVehicule,
                   Color = s.ColorVehicule,
                   Vehiculestate = s.StateVehicule,
-                  VehiculeRubrique = s.RubriqueVehicule
-
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                  VehiculeRubrique = s.RubriqueVehicule,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 default:
 
@@ -366,13 +393,27 @@ namespace LookaukwatApi.Controllers
                   GearBox = s.GearBoxVehicule,
                   Color = s.ColorVehicule,
                   Vehiculestate = s.StateVehicule,
-                  VehiculeRubrique = s.RubriqueVehicule
-
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+                  VehiculeRubrique = s.RubriqueVehicule,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
             }
 
 
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 2000000)
             {
@@ -392,12 +433,12 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(year))
             {
-                results = results.Where(m => m.Year != null && Convert.ToInt32(m.Year) <= Convert.ToInt32(year)).ToList();
+                results = results.Where(m =>  Convert.ToInt32(m.Year) <= Convert.ToInt32(year)).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(mileage) && Convert.ToInt32(mileage) < 300000)
             {
-                results = results.Where(m => m.Mileage != null && Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
+                results = results.Where(m =>  Convert.ToInt32(m.Mileage) <= Convert.ToInt32(mileage)).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(vehiculeBrand) && vehiculeBrand != "Toutes")
@@ -412,22 +453,22 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(vehiculeType) && vehiculeType != "Tout")
             {
-                results = results.Where(m => m.VehiculeType != null && m.VehiculeType == vehiculeType).ToList();
+                results = results.Where(m =>  m.VehiculeType == vehiculeType).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(petrol) && petrol != "Tout")
             {
-                results = results.Where(m => m.Petrol != null && m.Petrol == petrol).ToList();
+                results = results.Where(m =>  m.Petrol == petrol).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(numberOfDoor) && numberOfDoor != "Toutes")
             {
-                results = results.Where(m => m.NumberOfDoor != null && m.NumberOfDoor == numberOfDoor).ToList();
+                results = results.Where(m =>  m.NumberOfDoor == numberOfDoor).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(gearBox) && gearBox != "Toutes")
             {
-                results = results.Where(m => m.GearBox != null && m.GearBox == gearBox).ToList();
+                results = results.Where(m =>  m.GearBox == gearBox).ToList();
             }
             if (!string.IsNullOrWhiteSpace(color) && color != "Toutes")
             {
@@ -452,7 +493,8 @@ namespace LookaukwatApi.Controllers
                 id = s.id,
                 Price = s.Price,
                 Date = s.Date,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                NumberImages = s.Images.Count
             }).ToList();
 
             //List<ProductForMobile> Liste = new List<ProductForMobile>();
@@ -466,6 +508,15 @@ namespace LookaukwatApi.Controllers
 
             return List;
         }
+
+        [HttpGet]
+        [Route("api/Vehicule/GetModel")]
+        public async Task<List<string>> GetVehiculeModel_ForEquipment_OtherBrand(string rubrique, string brand)
+        {
+            return await db.Vehicules.Where(m => m.RubriqueVehicule == rubrique && m.BrandVehicule == brand).Select(s => s.ModelVehicule).ToListAsync();
+        }
+
+
 
         // PUT: api/Vehicule/5
         [ResponseType(typeof(void))]
@@ -530,13 +581,25 @@ namespace LookaukwatApi.Controllers
             {
                 return BadRequest(ModelState);
             }
+            //Know if its lookaukwat or not
+            if (User.IsInRole(MyRoleConstant.RoleAdmin))
+            {
+                vehiculeModel.IsLookaukwat = true;
+            }
+            else
+            {
+                vehiculeModel.IsParticulier = true;
+            }
             string UserId = User.Identity.GetUserId();
             var user = db.Users.FirstOrDefault(m => m.Id == UserId);
+            user.Date_First_Publish = DateTime.UtcNow;
             List<ImageProcductModel> img = new List<ImageProcductModel>();
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             vehiculeModel.User = user;
             vehiculeModel.DateAdd = DateTime.UtcNow;
+            vehiculeModel.IsActive = true;
+            vehiculeModel.Stock = 1;
             if (vehiculeModel.Coordinate == null || (vehiculeModel.Coordinate != null &&
                (vehiculeModel.Coordinate.Lat == null || vehiculeModel.Coordinate.Lon == null)))
             {

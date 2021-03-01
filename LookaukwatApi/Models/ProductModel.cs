@@ -29,6 +29,16 @@ namespace LookaukwatApi.Models
         public string SearchOrAskJob { get; set; }
         [DisplayName("Nombre de vues")]
         public int ViewNumber { get; set; }
+        public int CallNumber { get; set; }
+        public int MessageNumber { get; set; }
+
+        //for next part of application le 24/02/2021
+        public string Provider_Id { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsLookaukwat { get; set; }
+        public bool IsParticulier { get; set; }
+        public int Stock { get; set; }
+
         public virtual CategoryModel Category { get; set; }
         public virtual ApplicationUser User { get; set; }
         public virtual ProductCoordinateModel Coordinate { get; set; }

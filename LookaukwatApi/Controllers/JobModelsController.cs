@@ -39,8 +39,8 @@ namespace LookaukwatApi.Controllers
             jobModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Jobs.Where(m => 
-            m.Town == jobModel.Town && m.SearchOrAskJob == jobModel.SearchOrAskJob && m.id != jobModel.id).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.Jobs.Where(m => m.Town == jobModel.Town && m.SearchOrAskJob == jobModel.SearchOrAskJob 
+            && m.id != jobModel.id).OrderBy(o => Guid.NewGuid()).
             Take(6).Select(s => new SimilarProductViewModel
             {
                 id = s.id,
@@ -50,7 +50,8 @@ namespace LookaukwatApi.Controllers
                 Town = s.Town,
                 DateAdd = s.DateAdd,
                 Image = s.Images.Select(m => m.ImageMobile).FirstOrDefault(),
-
+                NumberImages = s.Images.Count,
+                IsLookaukwat = s.IsLookaukwat
             }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
@@ -62,7 +63,7 @@ namespace LookaukwatApi.Controllers
             //}
 
 
-            JobViewModel job = new JobViewModel 
+            JobViewModel job = new JobViewModel
             {
                 id = jobModel.id,
                 Title = jobModel.Title,
@@ -73,14 +74,16 @@ namespace LookaukwatApi.Controllers
                 User = jobModel.User,
                 Town = jobModel.Town,
                 ActivitySector = jobModel.ActivitySector,
-            TypeContract = jobModel.TypeContract,
-            SearchOrAskJob = jobModel.SearchOrAskJob,
-            Price = jobModel.Price,
-            Street = jobModel.Street,
-            SimilarProduct = Liste,
-            ViewNumber = jobModel.ViewNumber,
+                TypeContract = jobModel.TypeContract,
+                SearchOrAskJob = jobModel.SearchOrAskJob,
+                Price = jobModel.Price,
+                Street = jobModel.Street,
+                SimilarProduct = Liste,
+                ViewNumber = jobModel.ViewNumber,
                 Lat = jobModel.Coordinate.Lat,
                 Lon = jobModel.Coordinate.Lon,
+                IsLookaukwat = jobModel.IsLookaukwat,
+                Stock = jobModel.Stock
             };
 
             return Ok(job);
@@ -153,10 +156,10 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Job
         [Route("api/JobModels/GetOfferJobSearchNumber")]
-        public async Task<int> GetOfferJobSearchNumber(string categori, string town, string searchOrAskJob, string typeContract, string activitySector, int price)
+        public async Task<int> GetOfferJobSearchNumber(string categori, string town, string searchOrAskJob, string typeContract, string activitySector, int price, bool isParticulier, bool isLookaukwat)
         {
 
-            var results = await db.Jobs.
+            var results = await db.Jobs.Where(m => m.IsActive && m.Category.CategoryName == categori && m.SearchOrAskJob == searchOrAskJob).
               Select(s => new SearchViewModel
               {
                   Category = s.Category.CategoryName,
@@ -164,9 +167,22 @@ namespace LookaukwatApi.Controllers
                   SearchOrAskJob = s.SearchOrAskJob,
                   Price = s.Price,
                   TypeContract = s.TypeContract,
-                  ActivitySector = s.ActivitySector
+                  ActivitySector = s.ActivitySector,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier
                   
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob ).ToListAsync();
+              }).ToListAsync();
+
+            if(isLookaukwat && isParticulier)
+            {
+               results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 300000)
             {
@@ -180,12 +196,12 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeContract) && typeContract != "Tout")
             {
-                results = results.Where(m => m.TypeContract != null && m.TypeContract == typeContract).ToList();
+                results = results.Where(m => m.TypeContract == typeContract).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(activitySector) && activitySector != "Tout")
             {
-                results = results.Where(m => m.ActivitySector != null && m.ActivitySector == activitySector).ToList();
+                results = results.Where(m =>  m.ActivitySector == activitySector).ToList();
             }
 
 
@@ -194,7 +210,7 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Job
         [Route("api/JobModels/GetOfferJobSearch")]
-        public async Task<List<ProductForMobile>> GetOfferJobSearch(string categori, string town, string searchOrAskJob, string typeContract, string activitySector, int price, int pageIndex, int pageSize, string sortBy)
+        public async Task<List<ProductForMobile>> GetOfferJobSearch(string categori, string town, string searchOrAskJob, string typeContract, string activitySector, int price, int pageIndex, int pageSize, string sortBy, bool isParticulier, bool isLookaukwat)
         {
             List<SearchViewModel> results = new List<SearchViewModel>();
             switch (sortBy)
@@ -213,9 +229,12 @@ namespace LookaukwatApi.Controllers
                   SearchOrAskJob = s.SearchOrAskJob,
                   Price = s.Price,
                   TypeContract = s.TypeContract,
-                  ActivitySector = s.ActivitySector
+                  ActivitySector = s.ActivitySector,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
                     break;
                 case "MostOld":
@@ -232,9 +251,12 @@ namespace LookaukwatApi.Controllers
                   SearchOrAskJob = s.SearchOrAskJob,
                   Price = s.Price,
                   TypeContract = s.TypeContract,
-                  ActivitySector = s.ActivitySector
+                  ActivitySector = s.ActivitySector,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "LowerPrice":
                     results = await db.Jobs.OrderBy(o => o.Price).
@@ -250,9 +272,12 @@ namespace LookaukwatApi.Controllers
                   SearchOrAskJob = s.SearchOrAskJob,
                   Price = s.Price,
                   TypeContract = s.TypeContract,
-                  ActivitySector = s.ActivitySector
+                  ActivitySector = s.ActivitySector,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "HeigherPrice":
                     results = await db.Jobs.OrderByDescending(o => o.Price).
@@ -268,9 +293,12 @@ namespace LookaukwatApi.Controllers
                   SearchOrAskJob = s.SearchOrAskJob,
                   Price = s.Price,
                   TypeContract = s.TypeContract,
-                  ActivitySector = s.ActivitySector
+                  ActivitySector = s.ActivitySector,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 default:
                     results = await db.Jobs.OrderByDescending(o=>o.id).
@@ -286,15 +314,29 @@ namespace LookaukwatApi.Controllers
                   SearchOrAskJob = s.SearchOrAskJob,
                   Price = s.Price,
                   TypeContract = s.TypeContract,
-                  ActivitySector = s.ActivitySector
+                  ActivitySector = s.ActivitySector,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
                     break;
             }
 
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
-             
             if (price >= 0)
             {
                 results = results.Where(m => m.Price <= price).ToList();
@@ -307,12 +349,12 @@ namespace LookaukwatApi.Controllers
 
             if (!string.IsNullOrWhiteSpace(typeContract) && typeContract != "Tout")
             {
-                results = results.Where(m => m.TypeContract != null && m.TypeContract == typeContract).ToList();
+                results = results.Where(m =>  m.TypeContract == typeContract).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(activitySector) && activitySector != "Tout")
             {
-                results = results.Where(m => m.ActivitySector != null && m.ActivitySector == activitySector).ToList();
+                results = results.Where(m =>  m.ActivitySector == activitySector).ToList();
             }
 
 
@@ -329,7 +371,8 @@ namespace LookaukwatApi.Controllers
                 id = s.id,
                 Price = s.Price,
                 Date = s.Date,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                NumberImages = s.Images.Count
             }).ToList();
 
 
@@ -349,13 +392,27 @@ namespace LookaukwatApi.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            //Know if its lookaukwat or not
+            if (User.IsInRole(MyRoleConstant.RoleAdmin))
+            {
+                jobModel.IsLookaukwat = true;
+            }
+            else
+            {
+                jobModel.IsParticulier = true;
+            }
+
             string UserId = User.Identity.GetUserId();
             var user = db.Users.FirstOrDefault(m=>m.Id == UserId);
-           List<ImageProcductModel> img= new List<ImageProcductModel>();
+            user.Date_First_Publish = DateTime.UtcNow;
+            List<ImageProcductModel> img= new List<ImageProcductModel>();
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png",ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
            jobModel.User = user;
             jobModel.DateAdd = DateTime.UtcNow;
+            jobModel.IsActive = true;
+            jobModel.Stock = 1;
             if (jobModel.Coordinate == null || (jobModel.Coordinate != null &&
                 (jobModel.Coordinate.Lat == null || jobModel.Coordinate.Lon == null)))
             {

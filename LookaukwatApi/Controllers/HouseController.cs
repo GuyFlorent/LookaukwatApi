@@ -38,8 +38,8 @@ namespace LookaukwatApi.Controllers
             houseModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Houses.Where(m => 
-           m.Town == houseModel.Town && m.SearchOrAskJob == houseModel.SearchOrAskJob && m.id != houseModel.id && m.RubriqueHouse == houseModel.RubriqueHouse).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.Houses.Where(m => m.Town == houseModel.Town && m.SearchOrAskJob == houseModel.SearchOrAskJob 
+            && m.id != houseModel.id && m.RubriqueHouse == houseModel.RubriqueHouse).OrderBy(o => Guid.NewGuid()).
            Take(6).Select(s => new SimilarProductViewModel
            {
                id = s.id,
@@ -49,7 +49,9 @@ namespace LookaukwatApi.Controllers
                Town = s.Town,
                DateAdd = s.DateAdd,
                Image = s.Images.Select(m => m.ImageMobile).FirstOrDefault(),
-
+               NumberImages = s.Images.Count,
+               IsLookaukwat = s.IsLookaukwat,
+               
            }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
@@ -85,6 +87,8 @@ namespace LookaukwatApi.Controllers
                 ViewNumber = houseModel.ViewNumber,
                 Lat = houseModel.Coordinate.Lat,
                 Lon = houseModel.Coordinate.Lon,
+                IsLookaukwat = houseModel.IsLookaukwat,
+                Stock = houseModel.Stock
             };
 
 
@@ -124,10 +128,10 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search House
         [Route("api/House/GetOfferHouseSearchNumber")]
-        public async Task<int> GetOfferHouseSearchNumber(string categori, string town, string searchOrAskJob, int price, string rubriqueHouse, string typeHouse, string fabricMaterialHouse, string stateHouse, string colorHouse)
+        public async Task<int> GetOfferHouseSearchNumber(string categori, string town, string searchOrAskJob, int price, string rubriqueHouse, string typeHouse, string fabricMaterialHouse, string stateHouse, string colorHouse, bool isParticulier, bool isLookaukwat)
         {
 
-            var results = await db.Houses.
+            var results = await db.Houses.Where(m => m.IsActive && m.Category.CategoryName == categori && m.SearchOrAskJob == searchOrAskJob).
               Select(s => new SearchViewModel
               {
                   Category = s.Category.CategoryName,
@@ -138,9 +142,24 @@ namespace LookaukwatApi.Controllers
                   RubriqueHouse = s.RubriqueHouse,
                   ColorHouse = s.ColorHouse,
                   FabricMaterialHouse =s.FabricMaterialeHouse,
-                  StateHouse = s.StateHouse
+                  StateHouse = s.StateHouse,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).ToListAsync();
+
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 100000)
             {
@@ -184,7 +203,7 @@ namespace LookaukwatApi.Controllers
 
         // Result list House of Offer search House
         [Route("api/House/GetOfferHouseSearch")]
-        public async Task<List<ProductForMobile>> GetOfferHouseSearch(string categori, string town, string searchOrAskJob, int price, string rubriqueHouse, string typeHouse, string fabricMaterialHouse, string stateHouse, string colorHouse, int pageIndex, int pageSize, string sortBy)
+        public async Task<List<ProductForMobile>> GetOfferHouseSearch(string categori, string town, string searchOrAskJob, int price, string rubriqueHouse, string typeHouse, string fabricMaterialHouse, string stateHouse, string colorHouse, int pageIndex, int pageSize, string sortBy, bool isParticulier, bool isLookaukwat)
         {
             List<SearchViewModel> results = new List<SearchViewModel>();
 
@@ -208,9 +227,12 @@ namespace LookaukwatApi.Controllers
                 RubriqueHouse = s.RubriqueHouse,
                 ColorHouse = s.ColorHouse,
                 FabricMaterialHouse = s.FabricMaterialeHouse,
-                StateHouse = s.StateHouse
+                StateHouse = s.StateHouse,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "MostOld":
 
@@ -230,9 +252,12 @@ namespace LookaukwatApi.Controllers
                 RubriqueHouse = s.RubriqueHouse,
                 ColorHouse = s.ColorHouse,
                 FabricMaterialHouse = s.FabricMaterialeHouse,
-                StateHouse = s.StateHouse
+                StateHouse = s.StateHouse,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "LowerPrice":
 
@@ -252,9 +277,12 @@ namespace LookaukwatApi.Controllers
                 RubriqueHouse = s.RubriqueHouse,
                 ColorHouse = s.ColorHouse,
                 FabricMaterialHouse = s.FabricMaterialeHouse,
-                StateHouse = s.StateHouse
+                StateHouse = s.StateHouse,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "HeigherPrice":
                     results = await db.Houses.OrderByDescending(o => o.Price).
@@ -273,9 +301,12 @@ namespace LookaukwatApi.Controllers
                 RubriqueHouse = s.RubriqueHouse,
                 ColorHouse = s.ColorHouse,
                 FabricMaterialHouse = s.FabricMaterialeHouse,
-                StateHouse = s.StateHouse
+                StateHouse = s.StateHouse,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 default:
 
@@ -295,13 +326,27 @@ namespace LookaukwatApi.Controllers
                  RubriqueHouse = s.RubriqueHouse,
                  ColorHouse = s.ColorHouse,
                  FabricMaterialHouse = s.FabricMaterialeHouse,
-                 StateHouse = s.StateHouse
+                 StateHouse = s.StateHouse,
+                 IsLookaukwat = s.IsLookaukwat,
+                 IsParticulier = s.IsParticulier,
+                 IsActive = s.IsActive
 
-             }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+             }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
             }
 
-            
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 100000)
             {
@@ -338,10 +383,10 @@ namespace LookaukwatApi.Controllers
                 results = results.Where(m => m.StateHouse != null && m.StateHouse == stateHouse).ToList();
             }
 
-            List<SearchViewModel> Liste = new List<SearchViewModel>();
+            //List<SearchViewModel> Liste = new List<SearchViewModel>();
 
-            Liste = results.ToList();
-            var List = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            //Liste = results;
+            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -351,7 +396,8 @@ namespace LookaukwatApi.Controllers
                 id = s.id,
                 Price = s.Price,
                 Date = s.Date,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                NumberImages = s.Images.Count
             }).ToList();
 
 
@@ -414,13 +460,26 @@ namespace LookaukwatApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            //Know if its lookaukwat or not
+            if (User.IsInRole(MyRoleConstant.RoleAdmin))
+            {
+                houseModel.IsLookaukwat = true;
+            }
+            else
+            {
+                houseModel.IsParticulier = true;
+            }
+
             string UserId = User.Identity.GetUserId();
             var user = db.Users.FirstOrDefault(m => m.Id == UserId);
+            user.Date_First_Publish = DateTime.UtcNow;
             List<ImageProcductModel> img = new List<ImageProcductModel>();
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             houseModel.User = user;
             houseModel.DateAdd = DateTime.UtcNow;
+            houseModel.IsActive = true;
+            houseModel.Stock = 1;
             if (houseModel.Coordinate == null || (houseModel.Coordinate != null &&
                 (houseModel.Coordinate.Lat == null || houseModel.Coordinate.Lon == null)))
             {

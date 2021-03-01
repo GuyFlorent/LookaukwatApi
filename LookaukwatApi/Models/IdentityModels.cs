@@ -42,6 +42,11 @@ namespace LookaukwatApi.Models
         public DbSet<ModeModel> Modes { get; set; }
         public DbSet<ParrainModel> Parrains { get; set; }
         public DbSet<HouseModel> Houses { get; set; }
+        //for command and purchase
+        public DbSet<CommandModel> Commands { get; set; }
+        public DbSet<PurchaseModel> Purchases { get; set; }
+        public DbSet<DeliveredAdressModel> DeliveredAdresses { get; set; }
+        public DbSet<TrackingCommandModel> TrackingCommands { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

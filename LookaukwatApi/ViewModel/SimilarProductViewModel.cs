@@ -19,7 +19,9 @@ namespace LookaukwatApi.ViewModel
         public string Date { get => ConvertDate.Convert(DateAdd); }
 
         public string  Category { get; set; }
-       
+        public bool IsLookaukwat { get; set; }
         public  string Image { get; set; }
+        public  int NumberImages { get; set; }
+
     }
 }

@@ -49,7 +49,9 @@ namespace LookaukwatApi.Controllers
                Town = s.Town,
                DateAdd = s.DateAdd,
                Image = s.Images.Select(m => m.ImageMobile).FirstOrDefault(),
-
+               NumberImages = s.Images.Count,
+               IsLookaukwat = s.IsLookaukwat,
+              
            }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
@@ -83,7 +85,9 @@ namespace LookaukwatApi.Controllers
                 SimilarProduct = Liste,
                 Lat = multimediaModel.Coordinate.Lat,
                 Lon = multimediaModel.Coordinate.Lon,
-                ViewNumber = multimediaModel.ViewNumber
+                ViewNumber = multimediaModel.ViewNumber,
+                IsLookaukwat = multimediaModel.IsLookaukwat,
+                Stock = multimediaModel.Stock
             };
 
             return Ok(multimedia);
@@ -116,10 +120,10 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Multimedia
         [Route("api/Multimedia/GetOfferMultiSearchNumber")]
-        public async Task<int> GetOfferMultiSearchNumber(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity)
+        public async Task<int> GetOfferMultiSearchNumber(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity, bool isParticulier, bool isLookaukwat)
         {
 
-            var results = await db.Multimedia.
+            var results = await db.Multimedia.Where(m => m.IsActive && m.Category.CategoryName == categori && m.SearchOrAskJob == searchOrAskJob).
               Select(s => new SearchViewModel
               {
                   Category = s.Category.CategoryName,
@@ -129,9 +133,24 @@ namespace LookaukwatApi.Controllers
                   MultimediaBrand = s.Brand,
                   MultimediaModel = s.Model,
                   MultimediaRubrique = s.Type,
-                  MultimediaCapacity = s.Capacity
+                  MultimediaCapacity = s.Capacity,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).ToListAsync();
+
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 100000)
             {
@@ -168,7 +187,7 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Multimedia
         [Route("api/Multimedia/GetOfferMultiSearch")]
-        public async Task<List<ProductForMobile>> GetOfferMultiSearch(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity, int pageIndex, int pageSize, string sortBy)
+        public async Task<List<ProductForMobile>> GetOfferMultiSearch(string categori, string town, string searchOrAskJob, int price, string multimediaRubrique, string multimediaBrand, string multimediaModel, string multimediaCapacity, int pageIndex, int pageSize, string sortBy, bool isParticulier, bool isLookaukwat)
         {
             List<SearchViewModel> results = new List<SearchViewModel>();
 
@@ -190,9 +209,12 @@ namespace LookaukwatApi.Controllers
                 MultimediaBrand = s.Brand,
                 MultimediaModel = s.Model,
                 MultimediaRubrique = s.Type,
-                MultimediaCapacity = s.Capacity
+                MultimediaCapacity = s.Capacity,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "MostOld":
                     results = await db.Multimedia.OrderBy(o => o.id).
@@ -210,9 +232,12 @@ namespace LookaukwatApi.Controllers
                 MultimediaBrand = s.Brand,
                 MultimediaModel = s.Model,
                 MultimediaRubrique = s.Type,
-                MultimediaCapacity = s.Capacity
+                MultimediaCapacity = s.Capacity,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "LowerPrice":
                     results = await db.Multimedia.OrderBy(o => o.Price).
@@ -230,9 +255,10 @@ namespace LookaukwatApi.Controllers
                 MultimediaBrand = s.Brand,
                 MultimediaModel = s.Model,
                 MultimediaRubrique = s.Type,
-                MultimediaCapacity = s.Capacity
+                MultimediaCapacity = s.Capacity,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "HeigherPrice":
                     results = await db.Multimedia.OrderByDescending(o => o.Price).
@@ -250,9 +276,12 @@ namespace LookaukwatApi.Controllers
                 MultimediaBrand = s.Brand,
                 MultimediaModel = s.Model,
                 MultimediaRubrique = s.Type,
-                MultimediaCapacity = s.Capacity
+                MultimediaCapacity = s.Capacity,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 default:
 
@@ -271,14 +300,28 @@ namespace LookaukwatApi.Controllers
                  MultimediaBrand = s.Brand,
                  MultimediaModel = s.Model,
                  MultimediaRubrique = s.Type,
-                 MultimediaCapacity = s.Capacity
+                 MultimediaCapacity = s.Capacity,
+                 IsLookaukwat = s.IsLookaukwat,
+                 IsParticulier = s.IsParticulier,
+                 IsActive = s.IsActive
 
-             }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+             }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
                     break;
             }
 
-            
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 100000)
             {
@@ -335,7 +378,8 @@ namespace LookaukwatApi.Controllers
                 id = s.id,
                 Price = s.Price,
                 Date = s.Date,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                NumberImages = s.Images.Count
             }).ToList();
 
 
@@ -396,8 +440,20 @@ namespace LookaukwatApi.Controllers
             {
                 return BadRequest(ModelState);
             }
+            //Know if its lookaukwat or not
+            if (User.IsInRole(MyRoleConstant.RoleAdmin))
+            {
+                multimediaModel.IsLookaukwat = true;
+            }
+            else
+            {
+                multimediaModel.IsParticulier = true;
+            }
             string UserId = User.Identity.GetUserId();
             var user = db.Users.FirstOrDefault(m => m.Id == UserId);
+            user.Date_First_Publish = DateTime.UtcNow;
+            multimediaModel.IsActive = true;
+            multimediaModel.Stock = 1;
             List<ImageProcductModel> img = new List<ImageProcductModel>();
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);

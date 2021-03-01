@@ -19,6 +19,9 @@ namespace LookaukwatApi.ViewModel
         public string Town { get; set; }
         public string SearchOrAskJob { get; set; }
         public int Price { get; set; }
+        public bool IsLookaukwat { get; set; }
+        public bool IsParticulier { get; set; }
+        public bool IsActive { get; set; }
        public  List<ImageProcductModel> Images { get; set; }
         //For Job
         public string TypeContract { get; set; }

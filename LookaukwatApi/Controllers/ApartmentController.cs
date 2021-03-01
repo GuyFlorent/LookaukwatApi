@@ -38,8 +38,8 @@ namespace LookaukwatApi.Controllers
             apartmentRentalModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.ApartmentRentals.Where(m =>
-            m.Town == apartmentRentalModel.Town && m.SearchOrAskJob == apartmentRentalModel.SearchOrAskJob && m.id != apartmentRentalModel.id).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.ApartmentRentals.Where(m =>m.Town == apartmentRentalModel.Town && m.SearchOrAskJob == apartmentRentalModel.SearchOrAskJob 
+            && m.id != apartmentRentalModel.id && m.Type == apartmentRentalModel.Type).OrderBy(o => Guid.NewGuid()).
             Take(6).Select(s => new SimilarProductViewModel
             {
                 id = s.id,
@@ -49,7 +49,8 @@ namespace LookaukwatApi.Controllers
                 Town = s.Town,
                 DateAdd = s.DateAdd,
                 Image = s.Images.Select(m => m.ImageMobile).FirstOrDefault(),
-
+                NumberImages = s.Images.Count,
+                IsLookaukwat = s.IsLookaukwat,
             }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
@@ -83,6 +84,8 @@ namespace LookaukwatApi.Controllers
                 ViewNumber = apartmentRentalModel.ViewNumber,
                 Lat = apartmentRentalModel.Coordinate.Lat,
                 Lon = apartmentRentalModel.Coordinate.Lon,
+                IsLookaukwat = apartmentRentalModel.IsLookaukwat,
+                Stock = apartmentRentalModel.Stock
             };
 
             return Ok(apart);
@@ -116,12 +119,13 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Apartment
         [Route("api/Apartment/GetOfferAppartSearchNumber")]
-        public async Task<int> GetOfferAppartSearchNumber(string categori, string town, string searchOrAskJob,int price, int roomNumberAppart, string furnitureOrNotAppart, string typeAppart, int apartSurfaceAppart)
+        public async Task<int> GetOfferAppartSearchNumber(string categori, string town, string searchOrAskJob,int price, int roomNumberAppart, string furnitureOrNotAppart, string typeAppart, int apartSurfaceAppart, bool isParticulier, bool isLookaukwat)
         {
 
-            var results = await db.ApartmentRentals.
+            var results = await db.ApartmentRentals.Where(m => m.IsActive && m.Category.CategoryName == categori && m.SearchOrAskJob == searchOrAskJob).
               Select(s => new SearchViewModel
               {
+                  id = s.id,
                   Category = s.Category.CategoryName,
                   Town = s.Town,
                   SearchOrAskJob = s.SearchOrAskJob,
@@ -129,9 +133,24 @@ namespace LookaukwatApi.Controllers
                   RoomNumberAppart = s.RoomNumber,
                   FurnitureOrNotAppart = s.FurnitureOrNot,
                   TypeAppart = s.Type,
-                  ApartSurfaceAppart = s.ApartSurface
+                  ApartSurfaceAppart = s.ApartSurface,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier,
+                  IsActive = s.IsActive
+              }).ToListAsync();
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (!string.IsNullOrWhiteSpace(typeAppart) && typeAppart != "Tout")
             {
@@ -170,7 +189,7 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Apartment
         [Route("api/Apartment/GetOfferAppartSearch")]
-        public async Task<List<ProductForMobile>> GetOfferAppartSearch(string categori, string town, string searchOrAskJob, int price, int roomNumberAppart, string furnitureOrNotAppart, string typeAppart, int apartSurfaceAppart, int pageIndex, int pageSize, string sortBy)
+        public async Task<List<ProductForMobile>> GetOfferAppartSearch(string categori, string town, string searchOrAskJob, int price, int roomNumberAppart, string furnitureOrNotAppart, string typeAppart, int apartSurfaceAppart, int pageIndex, int pageSize, string sortBy, bool isParticulier, bool isLookaukwat)
         {
             List<SearchViewModel> results = new List<SearchViewModel>();
 
@@ -193,9 +212,12 @@ namespace LookaukwatApi.Controllers
                 FurnitureOrNotAppart = s.FurnitureOrNot,
                 TypeAppart = s.Type,
                 ApartSurfaceAppart = s.ApartSurface,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "MostOld":
 
@@ -214,9 +236,12 @@ namespace LookaukwatApi.Controllers
                 FurnitureOrNotAppart = s.FurnitureOrNot,
                 TypeAppart = s.Type,
                 ApartSurfaceAppart = s.ApartSurface,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "LowerPrice":
 
@@ -235,9 +260,12 @@ namespace LookaukwatApi.Controllers
                 FurnitureOrNotAppart = s.FurnitureOrNot,
                 TypeAppart = s.Type,
                 ApartSurfaceAppart = s.ApartSurface,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 case "HeigherPrice":
 
@@ -256,9 +284,12 @@ namespace LookaukwatApi.Controllers
                 FurnitureOrNotAppart = s.FurnitureOrNot,
                 TypeAppart = s.Type,
                 ApartSurfaceAppart = s.ApartSurface,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 default:
 
@@ -277,20 +308,34 @@ namespace LookaukwatApi.Controllers
                  FurnitureOrNotAppart = s.FurnitureOrNot,
                  TypeAppart = s.Type,
                  ApartSurfaceAppart = s.ApartSurface,
-                 ViewNumber = s.ViewNumber
+                 ViewNumber = s.ViewNumber,
+                 IsLookaukwat = s.IsLookaukwat,
+                 IsParticulier = s.IsParticulier,
+                 IsActive = s.IsActive
 
-             }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+             }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
             }
 
-            
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (!string.IsNullOrWhiteSpace(typeAppart) && typeAppart != "Tout")
             {
                 results = results.Where(m => m.TypeAppart != null && m.TypeAppart == typeAppart).ToList();
             }
 
-            if (price >= 0)
+            if (price >= 0 && price < 1000000)
             {
                 results = results.Where(m => m.Price <= price).ToList();
             }
@@ -306,7 +351,7 @@ namespace LookaukwatApi.Controllers
             }
 
 
-            if (apartSurfaceAppart >= 0)
+            if (apartSurfaceAppart >= 0 && apartSurfaceAppart < 2000)
             {
                 results = results.Where(m => m.ApartSurfaceAppart <= apartSurfaceAppart).ToList();
             }
@@ -318,10 +363,10 @@ namespace LookaukwatApi.Controllers
 
 
 
-            List<SearchViewModel> Liste = new List<SearchViewModel>();
+            //List<SearchViewModel> Liste = new List<SearchViewModel>();
 
-            Liste = results.ToList();
-            var List = Liste.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
+            //Liste = results.ToList();
+            var List = results.Skip(pageIndex * pageSize).Take(pageSize).Select(s => new ProductForMobile
             {
                 Title = s.Title,
                 Town = s.Town,
@@ -331,7 +376,8 @@ namespace LookaukwatApi.Controllers
                 id = s.id,
                 Price = s.Price,
                 Date = s.Date,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                NumberImages = s.Images.Count
             }).ToList();
 
             return List;
@@ -393,13 +439,26 @@ namespace LookaukwatApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            //Know if its lookaukwat or not
+            if (User.IsInRole(MyRoleConstant.RoleAdmin))
+            {
+                apartmentRentalModel.IsLookaukwat = true;
+            }
+            else
+            {
+                apartmentRentalModel.IsParticulier = true;
+            }
+
             string UserId = User.Identity.GetUserId();
             var user = db.Users.FirstOrDefault(m => m.Id == UserId);
+            user.Date_First_Publish = DateTime.UtcNow;
             List<ImageProcductModel> img = new List<ImageProcductModel>();
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             apartmentRentalModel.User = user;
             apartmentRentalModel.DateAdd = DateTime.UtcNow;
+            apartmentRentalModel.IsActive = true;
+            apartmentRentalModel.Stock = 1;
             if (apartmentRentalModel.Coordinate == null || (apartmentRentalModel.Coordinate != null &&
                 (apartmentRentalModel.Coordinate.Lat == null || apartmentRentalModel.Coordinate.Lon == null)))
             {

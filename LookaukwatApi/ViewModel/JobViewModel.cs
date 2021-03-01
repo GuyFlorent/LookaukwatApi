@@ -10,8 +10,8 @@ namespace LookaukwatApi.ViewModel
     public class JobViewModel
     {
         public int id { get; set; }
+        public int NumberImages { get; set; }
         [DisplayName("Titre")]
-      
         public string Title { get; set; }
       
         public string Description { get; set; }
@@ -41,5 +41,7 @@ namespace LookaukwatApi.ViewModel
         [DisplayName("Secteur d'activité")]
         public string ActivitySector { get; set; }
         public List<SimilarProductViewModel> SimilarProduct { get; set; }
+        public bool IsLookaukwat { get; set; }
+        public int Stock { get; set; }
     }
 }

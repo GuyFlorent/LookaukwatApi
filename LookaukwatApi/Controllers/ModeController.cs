@@ -39,9 +39,8 @@ namespace LookaukwatApi.Controllers
             modeModel.ViewNumber++;
             await db.SaveChangesAsync();
 
-            var ListeSimilar = db.Modes.Where(m => 
-            m.Town == modeModel.Town && m.SearchOrAskJob == modeModel.SearchOrAskJob &&
-            m.RubriqueMode == modeModel.RubriqueMode && m.id != modeModel.id && m.RubriqueMode == modeModel.RubriqueMode).OrderBy(o => Guid.NewGuid()).
+            var ListeSimilar = db.Modes.Where(m => m.Town == modeModel.Town && m.SearchOrAskJob == modeModel.SearchOrAskJob && m.RubriqueMode == modeModel.RubriqueMode
+            && m.id != modeModel.id && m.TypeMode == modeModel.TypeMode).OrderBy(o => Guid.NewGuid()).
             Take(6).Select(s => new SimilarProductViewModel
             {
                 id = s.id,
@@ -51,7 +50,9 @@ namespace LookaukwatApi.Controllers
                 Town = s.Town,
                 DateAdd = s.DateAdd,
                 Image = s.Images.Select(m => m.ImageMobile).FirstOrDefault(),
-
+                NumberImages = s.Images.Count,
+                IsLookaukwat = s.IsLookaukwat,
+               
             }).ToList();
 
             List<SimilarProductViewModel> Liste = new List<SimilarProductViewModel>();
@@ -88,7 +89,9 @@ namespace LookaukwatApi.Controllers
                 SimilarProduct = Liste,
                 Lat = modeModel.Coordinate.Lat,
                 Lon = modeModel.Coordinate.Lon,
-                ViewNumber = modeModel.ViewNumber
+                ViewNumber = modeModel.ViewNumber,
+                IsLookaukwat = modeModel.IsLookaukwat,
+                Stock = modeModel.Stock
             };
 
             return Ok(mode);
@@ -125,10 +128,10 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Mode
         [Route("api/Mode/GetOfferModeSearchNumber")]
-        public async Task<int> GetOfferModeSearchNumber(string categori, string town, string searchOrAskJob, int price, string rubriqueMode, string typeMode, string brandMode, string universMode, string sizeMode, string state, string colorMode)
+        public async Task<int> GetOfferModeSearchNumber(string categori, string town, string searchOrAskJob, int price, string rubriqueMode, string typeMode, string brandMode, string universMode, string sizeMode, string state, string colorMode, bool isParticulier, bool isLookaukwat)
         {
 
-            var results = await db.Modes.
+            var results = await db.Modes.Where(m => m.IsActive && m.Category.CategoryName == categori && m.SearchOrAskJob == searchOrAskJob).
               Select(s => new SearchViewModel
               {
                   Category = s.Category.CategoryName,
@@ -141,9 +144,24 @@ namespace LookaukwatApi.Controllers
                   UniversMode = s.UniversMode,
                   SizeMode = s.SizeMode,
                   State = s.StateMode,
-                  ColorMode = s.ColorMode
+                  ColorMode = s.ColorMode,
+                  IsLookaukwat = s.IsLookaukwat,
+                  IsParticulier = s.IsParticulier
 
-              }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+              }).ToListAsync();
+
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 100000)
             {
@@ -195,7 +213,7 @@ namespace LookaukwatApi.Controllers
 
         // Result of Offer search Mode
         [Route("api/Mode/GetOfferModeSearch")]
-        public async Task<List<ProductForMobile>> GetOfferModeSearch(string categori, string town, string searchOrAskJob, int price, string rubriqueMode, string typeMode, string brandMode, string universMode, string sizeMode, string state, string colorMode, int pageIndex, int pageSize, string sortBy)
+        public async Task<List<ProductForMobile>> GetOfferModeSearch(string categori, string town, string searchOrAskJob, int price, string rubriqueMode, string typeMode, string brandMode, string universMode, string sizeMode, string state, string colorMode, int pageIndex, int pageSize, string sortBy, bool isParticulier, bool isLookaukwat)
         {
             List<SearchViewModel> results = new List<SearchViewModel>();
 
@@ -221,9 +239,12 @@ namespace LookaukwatApi.Controllers
                 UniversMode = s.UniversMode,
                 SizeMode = s.SizeMode,
                 State = s.StateMode,
-                ColorMode = s.ColorMode
+                ColorMode = s.ColorMode,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
                     break;
                 case "MostOld":
@@ -246,9 +267,12 @@ namespace LookaukwatApi.Controllers
                 UniversMode = s.UniversMode,
                 SizeMode = s.SizeMode,
                 State = s.StateMode,
-                ColorMode = s.ColorMode
+                ColorMode = s.ColorMode,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
                     break;
                 case "LowerPrice":
@@ -271,9 +295,12 @@ namespace LookaukwatApi.Controllers
                 UniversMode = s.UniversMode,
                 SizeMode = s.SizeMode,
                 State = s.StateMode,
-                ColorMode = s.ColorMode
+                ColorMode = s.ColorMode,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
 
                     break;
                 case "HeigherPrice":
@@ -296,9 +323,12 @@ namespace LookaukwatApi.Controllers
                 UniversMode = s.UniversMode,
                 SizeMode = s.SizeMode,
                 State = s.StateMode,
-                ColorMode = s.ColorMode
+                ColorMode = s.ColorMode,
+                IsLookaukwat = s.IsLookaukwat,
+                IsParticulier = s.IsParticulier,
+                IsActive = s.IsActive
 
-            }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+            }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
                 default:
 
@@ -320,13 +350,27 @@ namespace LookaukwatApi.Controllers
                  UniversMode = s.UniversMode,
                  SizeMode = s.SizeMode,
                  State = s.StateMode,
-                 ColorMode = s.ColorMode
+                 ColorMode = s.ColorMode,
+                 IsLookaukwat = s.IsLookaukwat,
+                 IsParticulier = s.IsParticulier,
+                 IsActive = s.IsActive
 
-             }).Where(m => m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
+             }).Where(m => m.IsActive && m.Category == categori && m.SearchOrAskJob == searchOrAskJob).ToListAsync();
                     break;
             }
 
-            
+            if (isLookaukwat && isParticulier)
+            {
+                results = results.Where(m => m.IsLookaukwat || m.IsParticulier).ToList();
+            }
+            else if (isLookaukwat)
+            {
+                results = results.Where(m => m.IsLookaukwat).ToList();
+            }
+            else if (isParticulier)
+            {
+                results = results.Where(m => m.IsParticulier).ToList();
+            }
 
             if (price >= 0 && price < 100000)
             {
@@ -386,7 +430,8 @@ namespace LookaukwatApi.Controllers
                 id = s.id,
                 Price = s.Price,
                 Date = s.Date,
-                ViewNumber = s.ViewNumber
+                ViewNumber = s.ViewNumber,
+                NumberImages = s.Images.Count
             }).ToList();
 
             return List;
@@ -449,13 +494,26 @@ namespace LookaukwatApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            //Know if its lookaukwat or not
+            if (User.IsInRole(MyRoleConstant.RoleAdmin))
+            {
+                modeModel.IsLookaukwat = true;
+            }
+            else
+            {
+                modeModel.IsParticulier = true;
+            }
+
             string UserId = User.Identity.GetUserId();
             var user = db.Users.FirstOrDefault(m => m.Id == UserId);
+            user.Date_First_Publish = DateTime.UtcNow;
             List<ImageProcductModel> img = new List<ImageProcductModel>();
             var im = new ImageProcductModel() { id = Guid.NewGuid(), Image = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png", ImageMobile = "https://particulier-employeur.fr/wp-content/themes/fepem/img/general/avatar.png" };
             img.Add(im);
             modeModel.User = user;
             modeModel.DateAdd = DateTime.UtcNow;
+            modeModel.IsActive = true;
+            modeModel.Stock = 1;
             if (modeModel.Coordinate == null || (modeModel.Coordinate != null &&
                 (modeModel.Coordinate.Lat == null || modeModel.Coordinate.Lon == null)))
             {
